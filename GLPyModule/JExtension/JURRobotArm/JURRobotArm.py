@@ -83,6 +83,7 @@ class JURRobotArmWidget(JBaseExtensionWidget):
         self.EMERGENCY_STOPPED_RESET = 1
         self.PROTECTIVE_STOPPED_RESET = 1
         self.IS_PROGRAM_RUNNING = 0
+        self.MARGIN = 50
         self.ui.btn_disconnect.connect('clicked()', self.on_robot_arm_disconnect)
         self.ui.btn_connect.connect('clicked()', self.on_robot_arm_connect)
         self.ui.btn_robot_arm_stop.connect('clicked()', self.on_robot_arm_stop)
@@ -251,10 +252,10 @@ class JURRobotArmWidget(JBaseExtensionWidget):
         # print("reuploading script [py]")
         util.getModuleWidget("RequestStatus").send_cmd("UR, ReuploadScript")
         if not self.IS_PROGRAM_RUNNING:
-            util.singleShot(500,self.reuploadScript)
+            util.singleShot(500, self.reuploadScript)
         print("pro run")
 
-    def shellButton(self,argument):
+    def shellButton(self, argument):
         print("shell called")
         ret = util.getModuleWidget("RequestStatus").send_synchronize_cmd(f"UR, {argument}")
         if ret == "True":
@@ -345,26 +346,29 @@ class JURRobotArmWidget(JBaseExtensionWidget):
                 if map_info["IS_FREEDRIVE_STATE"] == "0":
                     print("caling fd [py]")
                     util.getModuleWidget("RequestStatus").send_cmd(f"UR, StartFreedriveMode")
+                    util.getModuleWidget("VeinConfig").overlay_robot()
+                    util.getModuleWidget("VeinTreat").overlay_robot()
             else:
                 # print("tool in 0 is 0")
                 if map_info["IS_FREEDRIVE_STATE"] == "1":
                     print("stopping fd [py]")
                     util.getModuleWidget("RequestStatus").send_cmd(f"UR, EndFreedriveMode")
+                    util.getModuleWidget("VeinConfig").show_robot()
+                    util.getModuleWidget("VeinTreat").show_robot()
 
         if "IS_NORMAL_MODE" in map_info and map_info["IS_NORMAL_MODE"] == "1":
             # print("[Safety Status] : Normal mode")
             self.EMERGENCY_STOPPED_RESET = 1
             self.PROTECTIVE_STOPPED_RESET = 1
-        if "IS_EMERGENCY_STOPPED" in map_info and map_info["IS_EMERGENCY_STOPPED"] == "1":
-            print("[Safety Status] : Emergency stopped")
-            if self.EMERGENCY_STOPPED_RESET == 1:
-                msg = "Emergency Stop"
-                btn_txt = "xxx"
-                argument = "EnableRobotAfterEmergency"
-                print("calling alert")
-                AlertDialog(msg,btn_txt,self.shellButton,argument,self.uiWidget)
-                print("finishing alert")
-                self.EMERGENCY_STOPPED_RESET = 0
+        # if "IS_EMERGENCY_STOPPED" in map_info and map_info["IS_EMERGENCY_STOPPED"] == "1":
+        #     print("[Safety Status] : Emergency stopped")
+        #     if self.EMERGENCY_STOPPED_RESET == 1:
+        #         msg = "Emergency Stop"
+        #         btn_txt = "xxx"
+        #         argument = "EnableRobotAfterEmergency"
+        #         print("calling alert")
+        #         print("finishing alert")
+        #         self.EMERGENCY_STOPPED_RESET = 0
         if "IS_PROTECTIVE_STOPPED" in map_info and map_info["IS_PROTECTIVE_STOPPED"] == "1":
             print("[Safety Status] : Protective stopped")
             if self.PROTECTIVE_STOPPED_RESET == 1:
@@ -372,11 +376,38 @@ class JURRobotArmWidget(JBaseExtensionWidget):
                 btn_txt = "xxx"
                 argument = "EnableRobotAfterProtective"
                 print("calling alert")
-                AlertDialog(msg,btn_txt,self.shellButton,argument,self.uiWidget)
+                util.getModuleWidget("JMessageBox").show_protective_stop('Protective Stop')
                 print("finishing alert")
                 self.PROTECTIVE_STOPPED_RESET = 0
         if "IS_PROGRAM_RUNNING" in map_info:
             self.IS_PROGRAM_RUNNING = 1 if map_info.get("IS_PROGRAM_RUNNING") == "1" else 0
+
+        if "IS_DIGITAL_TOOL_INPUT_1" in map_info:
+            util.global_data_map["IS_DIGITAL_TOOL_INPUT_1"] = map_info["IS_DIGITAL_TOOL_INPUT_1"]
+            print(f'TI 1 : {map_info["IS_DIGITAL_TOOL_INPUT_1"]}')
+            util.getModuleWidget("VeinTreat").update_debug_info(map_info["IS_DIGITAL_TOOL_INPUT_1"])
+
+        if "distance_value" in map_info:
+            try:
+                print(f'd-dist : {map_info["distance_value"]}')
+                dist_val = float(map_info["distance_value"])
+                print(f"dist : {dist_val}")
+                print(f'dist - margin : {dist_val - self.MARGIN}')
+                print(f'dist + margin : {dist_val + self.MARGIN}')
+            except Exception as e:
+                print(f"An error occurred: {e}")
+            if (dist_val < 200 or dist_val > 600):
+                print("calling status with 1")
+                util.getModuleWidget("VeinConfig").update_sport_status(1)
+                util.getModuleWidget("VeinTreat").update_sport_status(1)
+            elif (dist_val - self.MARGIN < 200 or dist_val + self.MARGIN > 600):
+                print("calling status with 2")
+                util.getModuleWidget("VeinConfig").update_sport_status(2)
+                util.getModuleWidget("VeinTreat").update_sport_status(2)
+            else:
+                print("calling status with 0")
+                util.getModuleWidget("VeinConfig").update_sport_status(0)
+                util.getModuleWidget("VeinTreat").update_sport_status(0)
 
         if "virutal_output" in map_info:
             if map_info["virutal_output"] == "1":
@@ -435,7 +466,7 @@ class JURRobotArmWidget(JBaseExtensionWidget):
             "UR, Rotate, -115.941,-120.35,101.352,-84.631,46.454,-5.334, 0, 0, 0, 0")
 
     def on_robot_arm_connect(self):
-        util.getModuleWidget("RequestStatus").send_cmd("UR, Connect, 172.30.38.12, 30004")
+        util.getModuleWidget("RequestStatus").send_cmd("UR, Connect, 172.30.38.165, 30004")
         # util.getModuleWidget("RequestStatus").send_cmd("UR, Open")
 
     def on_robot_arm_disconnect(self):
