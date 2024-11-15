@@ -1,0 +1,21 @@
+# ninja log v5
+1	181	7157815712206033	untitled3_autogen/timestamp	5ae398f0862d2d1b
+1	181	7157815712206033	untitled3_autogen/mocs_compilation.cpp	5ae398f0862d2d1b
+1	181	7157815712206033	D:/S521/GLPyModule/Project/PAAA/Resources/untitled3/untitled3_autogen/timestamp	5ae398f0862d2d1b
+1	181	7157815712206033	D:/S521/GLPyModule/Project/PAAA/Resources/untitled3/untitled3_autogen/mocs_compilation.cpp	5ae398f0862d2d1b
+185	867	7157815719406057	CMakeFiles/untitled3.dir/untitled3_autogen/mocs_compilation.cpp.obj	4788a30adb1ad736
+183	940	7157815720156036	CMakeFiles/untitled3.dir/main.cpp.obj	6d984170b34da5e9
+182	1050	7157815721246010	CMakeFiles/untitled3.dir/mainwindow.cpp.obj	ca5fd09105971f0c
+1051	1211	7157815722826011	untitled3.exe	38f79aa7de9c8218
+3	90	7157817910750875	untitled3_autogen/timestamp	5ae398f0862d2d1b
+3	90	7157817910750875	untitled3_autogen/mocs_compilation.cpp	5ae398f0862d2d1b
+3	90	7157817910750875	D:/S521/GLPyModule/Project/PAAA/Resources/untitled3/untitled3_autogen/timestamp	5ae398f0862d2d1b
+3	90	7157817910750875	D:/S521/GLPyModule/Project/PAAA/Resources/untitled3/untitled3_autogen/mocs_compilation.cpp	5ae398f0862d2d1b
+93	1041	7157817920200596	CMakeFiles/untitled3.dir/mainwindow.cpp.obj	ca5fd09105971f0c
+1041	1182	7157817921601288	untitled3.exe	38f79aa7de9c8218
+2	93	7157819503144187	untitled3_autogen/timestamp	5ae398f0862d2d1b
+2	93	7157819503144187	untitled3_autogen/mocs_compilation.cpp	5ae398f0862d2d1b
+2	93	7157819503144187	D:/S521/GLPyModule/Project/PAAA/Resources/untitled3/untitled3_autogen/timestamp	5ae398f0862d2d1b
+2	93	7157819503144187	D:/S521/GLPyModule/Project/PAAA/Resources/untitled3/untitled3_autogen/mocs_compilation.cpp	5ae398f0862d2d1b
+96	1073	7157819512894189	CMakeFiles/untitled3.dir/mainwindow.cpp.obj	ca5fd09105971f0c
+1074	1258	7157819514734184	untitled3.exe	38f79aa7de9c8218

@@ -1,0 +1,6 @@
+#include "qPowerReceiveThreadObject.h"
+
+
+
+
+

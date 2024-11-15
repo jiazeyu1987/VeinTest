@@ -1,0 +1,79 @@
+Log file created at 2024-02-03 09:30:56.090935
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<JPowerControl start unit test >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+
+start test case 0
+-------------------------------------- is running index 0 function reset_page --------------------------------------
+the 1 passed
+
+
+### Tick 0.09 Second
+### Memory 422.62 MB
+
+
+
+start test case 1
+-------------------------------------- is running index 1 function open_control_panel --------------------------------------
+the 2 passed
+
+
+### Tick 0.12 Second
+### Memory 579.72 MB
+
+
+
+start test case 2
+-------------------------------------- is running index 2 function start_bundle_1 --------------------------------------
+the 3 passed
+
+
+### Tick 0.3 Second
+### Memory 562.61 MB
+
+
+
+start test case 3
+-------------------------------------- is running index 3 function check_init_connect_status --------------------------------------
+the 3 passed
+
+
+### Tick 0.07 Second
+### Memory 578.73 MB
+success_connected_to_io use 0.04 second
+
+
+
+start test case 4
+-------------------------------------- is running index 4 function add_tick_event_listener --------------------------------------
+the 5 passed
+
+
+### Tick 0.31 Second
+### Memory -2.93 MB
+
+
+
+start test case 5
+-------------------------------------- is running index 5 function connect_power_device --------------------------------------
+the 5 passed
+
+
+### Tick 0.0 Second
+### Memory 11.05 MB
+success connected to power device use 0.54 second
+
+
+
+start test case 6
+-------------------------------------- is running index 6 function open_power_control_software --------------------------------------
+the 6 passed
+
+
+### Tick 0.0 Second
+### Memory 56.32 MB
+[ERROR] can't open software in time 2.92 second
+
+
+
+6 test Done

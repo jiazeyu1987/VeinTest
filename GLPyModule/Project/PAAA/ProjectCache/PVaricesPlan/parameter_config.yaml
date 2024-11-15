@@ -1,0 +1,9 @@
+water_pump_speed: 2 #水速
+water_bladder_temp: 0  #水囊温度
+press_value: 0  #压力值
+oxygen_concentration: 0  #氧浓度
+output_power: 0  #输出电压
+power_factor: 0.5 #功率系数
+compressor_status: 0
+compressor_speed: 0.0
+compressor_current: 0.0

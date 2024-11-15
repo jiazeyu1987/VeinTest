@@ -1,0 +1,2 @@
+logo.ico 软件在桌面上显示的图标
+splash_screen.png 双击软件加载的时候显示的默认图片

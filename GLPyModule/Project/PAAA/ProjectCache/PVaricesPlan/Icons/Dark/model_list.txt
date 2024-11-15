@@ -1,0 +1,5 @@
+model_visible_2d.png:		让模型在2D视图上显示
+model_invisible_2d.png:		让模型在2D视图上隐藏
+model_visible_3d.png:		让模型在3D视图上显示
+model_invisible_3d.png:		让模型在3D视图上隐藏
+model_delete.png:		删除当前的模型

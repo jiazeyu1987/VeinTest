@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ParamConfig</class>
+ <widget class="QDialog" name="ParamConfig">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1000</width>
+    <height>700</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>1000</width>
+    <height>700</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>16777215</width>
+    <height>16666</height>
+   </size>
+  </property>
+  <property name="focusPolicy">
+   <enum>Qt::FocusPolicy::ClickFocus</enum>
+  </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>243</x>
+     <y>135</y>
+     <width>65</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>功率：</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="power">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>126</y>
+     <width>360</width>
+     <height>48</height>
+    </rect>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::FocusPolicy::StrongFocus</enum>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="width">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>206</y>
+     <width>360</width>
+     <height>48</height>
+    </rect>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::FocusPolicy::StrongFocus</enum>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="circle">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>286</y>
+     <width>360</width>
+     <height>48</height>
+    </rect>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::FocusPolicy::StrongFocus</enum>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btn1">
+   <property name="geometry">
+    <rect>
+     <x>349</x>
+     <y>550</y>
+     <width>100</width>
+     <height>42</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>取消</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btn2">
+   <property name="geometry">
+    <rect>
+     <x>551</x>
+     <y>550</y>
+     <width>100</width>
+     <height>42</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>确认</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>199</x>
+     <y>215</y>
+     <width>109</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>突发宽度：</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>199</x>
+     <y>295</y>
+     <width>109</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>突发周期：</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_4">
+   <property name="geometry">
+    <rect>
+     <x>199</x>
+     <y>375</y>
+     <width>109</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>治疗时间：</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="title">
+   <property name="geometry">
+    <rect>
+     <x>445</x>
+     <y>16</y>
+     <width>111</width>
+     <height>40</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_5">
+   <property name="geometry">
+    <rect>
+     <x>424</x>
+     <y>555</y>
+     <width>152</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="treat_time">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>366</y>
+     <width>360</width>
+     <height>48</height>
+    </rect>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::FocusPolicy::StrongFocus</enum>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="cool_time">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>446</y>
+     <width>360</width>
+     <height>48</height>
+    </rect>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::FocusPolicy::StrongFocus</enum>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_6">
+   <property name="geometry">
+    <rect>
+     <x>692</x>
+     <y>134</y>
+     <width>44</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>w</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_7">
+   <property name="geometry">
+    <rect>
+     <x>199</x>
+     <y>455</y>
+     <width>109</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>冷却时间：</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_8">
+   <property name="geometry">
+    <rect>
+     <x>692</x>
+     <y>214</y>
+     <width>44</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>s</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_9">
+   <property name="geometry">
+    <rect>
+     <x>692</x>
+     <y>294</y>
+     <width>44</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>s</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_10">
+   <property name="geometry">
+    <rect>
+     <x>692</x>
+     <y>374</y>
+     <width>44</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>s</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_11">
+   <property name="geometry">
+    <rect>
+     <x>692</x>
+     <y>454</y>
+     <width>44</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>s</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

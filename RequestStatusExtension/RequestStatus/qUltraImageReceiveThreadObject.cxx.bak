@@ -1,0 +1,310 @@
+#include "qUltraImageReceiveThreadObject.h"
+#include <iostream>
+
+#include "vtkMRMLCoreTestingMacros.h"
+#include "vtkMRMLScene.h"
+#include "qSlicerApplication.h"
+#include "vtkMRMLStreamingVolumeNode.h"
+#include <QRandomGenerator>
+#include <qSlicerLayoutManager.h>
+#include <vtkCollection.h>
+#include <vtkMRMLSliceLogic.h>
+#include <qMRMLSliceWidget.h>
+#include <vtkMRMLSliceNode.h>
+#include <vtkMRMLSliceCompositeNode.h>
+#include <vtkSlicerVolumeRenderingLogic.h>
+#include <vtkMRMLVolumeRenderingDisplayNode.h>
+unsigned char pDST[921600];
+unsigned char pPDI[1228800];
+unsigned char pTemp[518144];
+int frameCountBMode = 0;
+int frameCountTMode = 0;
+QElapsedTimer timer2;
+int flag = 0;
+bool flag_bmode = false;
+bool flag_tmode = false;
+bool flag_pdimode = false;
+
+void MonitorISR(const int& MsgType, unsigned char* pData, const unsigned int nLength)
+{
+	switch (MsgType)
+	{
+	case 1:  //Probe connect
+		qDebug() << "On MonitorISR:" << MsgType << "," << pData << "," << nLength;
+		break;
+	case 2:  //Voltage monitor
+		qDebug() << "On MonitorISR2:" << MsgType << "," << pData << "," << nLength;
+		break;
+	case 3:  //Temperature monitor
+		qDebug() << "On MonitorISR3:" << MsgType << "," << pData << "," << nLength;
+		break;
+	default:
+		break;
+	}
+}
+
+void FrameISR2(const int& eMode, unsigned char* pData, const unsigned int nLength)
+{
+	if (flag == 0) {
+		timer2.start();
+		flag++;
+	}
+	switch (eMode)
+	{
+	case 1:  //B mode
+		//frameCountBMode++;
+		//if (timer2.elapsed() >= 1000) {  // 每过1000毫秒（1秒）计算一次帧率
+		//	int fps = frameCountBMode;
+		//	qDebug() << "fps2:" << fps;;
+		//	timer2.restart();
+		//}
+		//qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX:" << nLength << ":XXXXXXXXXXXXXXXX" ;
+		memcpy(pDST, pData, nLength);
+		flag_bmode = true;
+		break;
+	case 2:  //PDI mode
+		memcpy(pPDI, pData, nLength);
+		flag_pdimode = true;
+		break;
+	case 3:  //Temperature mode
+		qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX:" << nLength << ":zzzzzzzzzzzzzzzzzzzz";
+		frameCountTMode++;
+		memcpy(pTemp, pData, nLength);
+		flag_tmode = true;
+		break;
+	default:
+		break;
+	}
+}
+
+qUltraImageReceiveThreadObject::qUltraImageReceiveThreadObject()
+{
+    
+}
+
+qUltraImageReceiveThreadObject::~qUltraImageReceiveThreadObject()
+{
+   
+}
+
+unsigned char* qUltraImageReceiveThreadObject::get_ultra_image() {
+	return pDST;
+}
+
+void qUltraImageReceiveThreadObject::OnReceiveObjectInnerTick2() {
+	int randomValue = QRandomGenerator::global()->bounded(1000);
+	for (int i = 0; i < 921600; i++) {
+		pDST[i] = (randomValue + i) % 255;
+	}
+	auto nodename = "ultrasound_volue";
+	auto node = qSlicerApplication::application()->mrmlScene()->GetFirstNodeByName(nodename);
+	if (node == nullptr) {
+		node = qSlicerApplication::application()->mrmlScene()->AddNewNodeByClass("vtkMRMLVectorVolumeNode");
+		node->SetName(nodename);
+	}
+
+	vtkMRMLVectorVolumeNode* mvnode = dynamic_cast<vtkMRMLVectorVolumeNode*>(node);
+	vtkImageData* newVolumeData = mvnode->GetImageData();
+
+	/*vtkNew<vtkSlicerVolumeRenderingLogic> vrLogic;
+	vrLogic->SetMRMLScene(qSlicerApplication::application()->mrmlScene());
+	vrLogic->CreateDefaultVolumeRenderingNodes(mvnode);
+	vtkMRMLVolumeRenderingDisplayNode* vrDisplayNode = vrLogic->GetFirstVolumeRenderingDisplayNode(mvnode);
+	vrDisplayNode->SetVisibility(false);*/
+
+	if (newVolumeData == nullptr) {
+		vtkNew<vtkImageData> imageData;
+		imageData->SetDimensions(640, 480, 3); // 使用2D图像的尺寸
+		imageData->AllocateScalars(VTK_UNSIGNED_CHAR, 3); // 假设我们只使用一个颜色通道
+		unsigned char* pixel = static_cast<unsigned char*>(imageData->GetScalarPointer(0, 0, 0));
+		for (size_t i = 0; i < 921600; i++) {
+			pixel[i] = pDST[921600 - 1 - i];
+		}
+		mvnode->SetAndObserveImageData(imageData);
+
+		/*auto displaynode = mvnode->GetDisplayNode();
+		if (displaynode == nullptr) {
+			mvnode->CreateDefaultDisplayNodes();
+			displaynode = mvnode->GetDisplayNode();
+		}*/
+		/*std::vector<std::string> viewids;
+		viewids.push_back("vtkMRMLSliceNodeRed+");
+		displaynode->RemoveAllViewNodeIDs();
+		displaynode->SetViewNodeIDs(viewids);*/
+
+		/*qSlicerLayoutManager* layoutManager = qSlicerApplication::application()->layoutManager();
+		vtkCollection* sliceLogics = layoutManager->mrmlSliceLogics();
+		
+		if (!sliceLogics)
+		{
+			return;
+		}
+		vtkObject* object = nullptr;
+		vtkCollectionSimpleIterator it;
+		for (sliceLogics->InitTraversal(it); (object = sliceLogics->GetNextItemAsObject(it));)
+		{
+			vtkMRMLSliceLogic* sliceLogic = vtkMRMLSliceLogic::SafeDownCast(object);
+			sliceLogic->FitSliceToAll(true);
+		}*/
+		
+	}
+	else {
+		unsigned char* pixel = static_cast<unsigned char*>(newVolumeData->GetScalarPointer(0, 0, 0));
+		for (size_t i = 0; i < 921600; i++) {
+			pixel[i] = pDST[921600 - 1 - i];
+		}
+		auto displaynode = mvnode->GetDisplayNode();
+		if (displaynode == nullptr) {
+			mvnode->CreateDefaultDisplayNodes();
+			displaynode = mvnode->GetDisplayNode();
+		}
+		/*std::vector<std::string> viewids;
+		viewids.push_back("vtkMRMLSliceNodeRed+");
+		displaynode->RemoveAllViewNodeIDs();
+		displaynode->SetViewNodeIDs(viewids);*/
+	}
+
+	
+	return;
+
+}
+
+void qUltraImageReceiveThreadObject::CaculateFPS() 
+{
+	frameCount++;
+	if (timer.elapsed() >= 1000) {  // 每过1000毫秒（1秒）计算一次帧率
+		int fps = frameCount;
+		qDebug() << "fps:" << fps;;
+		frameCount = 0;
+		timer.restart();
+	}
+}
+
+void qUltraImageReceiveThreadObject::SaveToPng() 
+{
+	if (flag_bmode) {
+		unsigned char* pDST2 = new unsigned char[921600 / 3];
+		for (int i = 0; i < 921600 / 3; i++) {
+			pDST2[i] = pDST[i * 3];
+		}
+		QImage image(pDST2, 640, 480, QImage::Format_Grayscale8);
+		QString path = QString("D:/2/tmp/%1.png").arg(frameCountBMode);
+		image.save(path);
+	}
+	flag_bmode = false;
+}
+
+void qUltraImageReceiveThreadObject::SaveToBin()
+{
+	if (flag_tmode) {
+		QString path = QString("D:/2/tmp/%1.bin").arg(frameCountTMode);
+		std::ofstream outFile(path.toStdString(), std::ios::binary);
+		if (!outFile) {
+			std::cerr << "Error opening file for writing." << std::endl;
+			return;  // 文件打开失败，返回错误代码
+		}
+		outFile.write(reinterpret_cast<const char*>(pTemp), 518144);
+
+		// 检查是否成功写入
+		if (!outFile) {
+			std::cerr << "Error writing to file." << std::endl;
+			return ;  // 写入失败，返回错误代码
+		}
+
+		// 关闭文件
+		outFile.close();
+	}
+	flag_tmode = false;
+}
+
+void qUltraImageReceiveThreadObject::UpdateBModeTick() {
+	auto nodename = "ultrasound_volue";
+	auto node = qSlicerApplication::application()->mrmlScene()->GetFirstNodeByName(nodename);
+	if (node == nullptr) {
+		node = qSlicerApplication::application()->mrmlScene()->AddNewNodeByClass("vtkMRMLVectorVolumeNode");
+		node->SetName(nodename);
+	}
+
+	vtkMRMLVectorVolumeNode* mvnode = dynamic_cast<vtkMRMLVectorVolumeNode*>(node);
+	vtkImageData* newVolumeData = mvnode->GetImageData();
+
+	if (newVolumeData == nullptr) {
+		vtkNew<vtkImageData> imageData;
+		imageData->SetDimensions(640, 480, 3); // 使用2D图像的尺寸
+		imageData->AllocateScalars(VTK_UNSIGNED_CHAR, 3); // 假设我们只使用一个颜色通道
+		unsigned char* pixel = static_cast<unsigned char*>(imageData->GetScalarPointer(0, 0, 0));
+		for (size_t i = 0; i < 921600; i++) {
+			pixel[i] = pDST[921600 - 1 - i];
+		}
+		mvnode->SetAndObserveImageData(imageData);
+	}
+	else {
+		unsigned char* pixel = static_cast<unsigned char*>(newVolumeData->GetScalarPointer(0, 0, 0));
+		for (size_t i = 0; i < 921600; i++) {
+			pixel[i] = pDST[921600 - 1 - i];
+		}
+	}
+}
+
+void qUltraImageReceiveThreadObject::UpdatePDIModeTick() {
+	auto nodename = "ultrasound_pdi";
+	auto node = qSlicerApplication::application()->mrmlScene()->GetFirstNodeByName(nodename);
+	if (node == nullptr) {
+		node = qSlicerApplication::application()->mrmlScene()->AddNewNodeByClass("vtkMRMLVectorVolumeNode");
+		node->SetName(nodename);
+	}
+
+	vtkMRMLVectorVolumeNode* mvnode = dynamic_cast<vtkMRMLVectorVolumeNode*>(node);
+	vtkImageData* newVolumeData = mvnode->GetImageData();
+
+	if (newVolumeData == nullptr) {
+		vtkNew<vtkImageData> imageData;
+		imageData->SetDimensions(640, 480, 3); // 使用2D图像的尺寸
+		imageData->AllocateScalars(VTK_UNSIGNED_CHAR, 4); // 假设我们只使用一个颜色通道
+		unsigned char* pixel = static_cast<unsigned char*>(imageData->GetScalarPointer(0, 0, 0));
+		for (size_t i = 0; i < 1228800; i++) {
+			pixel[i] = pDST[1228800 - 1 - i];
+		}
+		mvnode->SetAndObserveImageData(imageData);
+	}
+	else {
+		unsigned char* pixel = static_cast<unsigned char*>(newVolumeData->GetScalarPointer(0, 0, 0));
+		for (size_t i = 0; i < 1228800; i++) {
+			pixel[i] = pDST[1228800 - 1 - i];
+		}
+	}
+}
+
+void qUltraImageReceiveThreadObject::OnReceiveObjectInnerTick() {
+	if (debug_mode == "SaveToBin") {
+		SaveToBin();
+	}
+	//CaculateFPS();
+	UpdateBModeTick();
+	//UpdatePDIModeTick();
+}
+
+
+
+
+void qUltraImageReceiveThreadObject::init_sdk() {
+	gUltraSDK = new UltraSDK();
+	gUltraSDK->initializeSDK(FrameISR2);
+	gUltraSDK->setMonitorMgrCallback(MonitorISR);
+}
+
+void qUltraImageReceiveThreadObject::FrameISR(const int& eMode, const char* pData, const unsigned int nLength)
+{
+	switch (eMode)
+	{
+	case 1:  //B mode
+		break;
+	case 2:  //PDI mode
+		break;
+	case 3:  //Temperature mode
+
+		break;
+	default:
+		break;
+	}
+}

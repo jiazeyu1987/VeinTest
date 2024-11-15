@@ -1,0 +1,14 @@
+volume_fresh.png:		刷新影像列表
+volume_invisible_all_3D.png:		隐藏所有3D影像的体绘制
+volume_default_cover.jpg:		默认会显示的影像的缩略图
+volume_exchange.png:		切换基础影像和配准之后的影像
+volume_visible_3D.png:		点击显示当前影像的体绘制
+volume_invisible_3D.png:		点击关闭当前影像的体绘制
+volume_visible_2D.png:		在二维视图中显示当前的影像
+volume_remove.png:		删除当前的影像
+volume_preset.png:		点击选择一个3D预设
+volume_visible_roi.png:		点击显示当前影像的体绘制ROI
+volume_invisible_roi.png:		点击关闭当前影像的体绘制ROI
+volume_fit_roi.png:		点击重置ROI为初始状态
+volume_register.png:		配准两个不同的影像
+volume_register_self.png:		如果是四维影像,点击可以进行自配准

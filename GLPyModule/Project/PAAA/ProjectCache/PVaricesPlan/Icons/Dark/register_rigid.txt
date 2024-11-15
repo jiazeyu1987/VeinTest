@@ -1,0 +1,4 @@
+register_origin.png:		该影像还没有被配准,出于初始装填
+register_for_check.png:		该影像还已经被配准,需要检查是否配准符合要求
+register_ok.png:		该影像已经正确被配准,配准结果已手动确认
+register_cancel.png:		删除当前影像的配准结果

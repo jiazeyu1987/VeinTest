@@ -1,0 +1,291 @@
+{
+  "project_name": "PVaricesPlan",
+  "window_title": "璞润静脉曲张系统",
+  "version": "v1.0",
+  "slice_view_background_color": "0|0|0",
+  "threeD_view_background_color": "0|0|0",
+  "threeD_view_background_color2": "122|122|122",
+  "scene_extension": "mrb",
+  "Global": {
+    "layout_style": "7",
+    "username_limit": "0",
+    "use_keyboard": "2",
+    "login_style": "5"
+  },
+  "pre_init": "JAnnotation, DICOM, RDNDevice",
+  "show_box": "0",
+  "show_axis": "0",
+  "link_control": "2",
+  "show_controller": "0",
+  "unique_color_controller": "0",
+  "controller_direction": "2",
+  "jpacs_advance": "0",
+  "login_auth": "0",
+  "login_disclaimer": "2",
+  "login_agreement": "0",
+  "login_privacy": "0",
+  "dce_add_button": "0",
+  "jpacs": {
+    "jpacs_profile": "2",
+    "jpacs_saves_shotcut": "2",
+    "jpacs_menu": "2",
+    "jpacs_only_one_select": "0",
+    "need_connect_pacs": "2",
+    "default_recent_mrb": "2"
+  },
+  "controller": {
+    "use_left_mouse_mode_1": "0",
+    "show_slice_pinButton": "0",
+    "show_sliceVisibility": "0",
+    "show_slice_viewLabel": "0",
+    "show_slice_MaximizeViewButton": "0",
+    "show_slice_fitToWindowToolButton": "0",
+    "show_sliceOffsetSlider": "0",
+    "show_sliceOffsetSlider_SpinBox": "0",
+    "show_3d_pinButton": "0",
+    "show_3d_viewLabel": "0",
+    "show_3d_MaximizeViewButton": "0",
+    "show_3d_fitToWindowToolButton": "0",
+    "window_border_color": "0"
+  },
+  "annotation": {
+    "mouse_cursor_value": 0,
+    "intersection_point": 0,
+    "ACS": 0,
+    "Ruler": 0
+  },
+  "menu_bar": {
+    "show_menu_bar": false,
+    "show_file_menu": false,
+    "show_edit_menu": false,
+    "show_view_menu": false,
+    "show_help_menu": false,
+    "file_add_data": false,
+    "file_add_dicom_data": false,
+    "file_recent": false,
+    "file_donwload_sample_data": false,
+    "file_save_data": false,
+    "file_close_scene": false,
+    "file_exit": false,
+    "edit_cut": false,
+    "edit_copy": false,
+    "edit_paste": false,
+    "edit_settings": false,
+    "view_layout": false,
+    "view_toolbars": false,
+    "view_appearance": false,
+    "view_module_finder": false,
+    "view_extensions_manager": false,
+    "view_python_console": false,
+    "view_home": false,
+    "view_error_log": false,
+    "help_about": false
+  },
+  "register": {
+    "manual_register_type": 0
+  },
+  "JMeasure": {
+    "module_config": "1",
+    "left_to_right": "whirling|reset|windowlevel_auto|tool_windowlevel|tool_save|tool_layout|tool_measurebox|tool_setting|tool_handeye|tool_ime|tool_tick|tool_elibot|tool_usb",
+    "use_tool_bar": 0,
+    "orientation": "vertical",
+    "button_width": 24,
+    "button_height": 24
+  },
+  "JManagerModel": {
+    "function_list": "无, 详细信息"
+  },
+  "layout": [
+    {
+      "id": 510,
+      "info": "双屏-左4右1"
+    },
+    {
+      "id": 509,
+      "info": "双屏-左1右4"
+    },
+    {
+      "id": 507,
+      "info": "双屏-131"
+    },
+    {
+      "id": 508,
+      "info": "双屏-132"
+    },
+    {
+      "id": 511,
+      "info": "双屏表格"
+    },
+    {
+      "id": 518,
+      "info": "单屏幕"
+    }
+  ],
+  "SNormalScalarManager": {
+    "presets": "MR-Default, CT-AAA, CT-Bone",
+    "function_list": "无, ROI, 二维视图, 配准, 融合, 详细信息, 曲面拉直",
+    "show_color_legend_2d": 0,
+    "show_longmen": 0
+  },
+  "JModules": {
+    "p_module_need_to_load": "JBase, JMessageBox, UltrasoundCheckUp, JLogin, JAdministrator, JEngineer, JMeasure, JPCCS, Ultrasound, VeinConfig, VeinTreat, RDNDevice, JWaterControl, JUSBConnector",
+    "r_module_need_to_load": "RequestStatusExtension, TickExtension"
+  },
+  "Page": [
+    {
+      "PageNumber": "3",
+      "ModuleName": "JPCCS",
+      "width": "-1",
+      "ShowMain": "False"
+    },
+    {
+      "PageNumber": "4",
+      "ModuleName": "VeinConfig",
+      "width": "1800",
+      "ShowMain": "False"
+    },
+    {
+      "PageNumber": "5",
+      "ModuleName": "VeinTreat",
+      "width": "1400",
+      "ShowMain": "False"
+    },
+    {
+      "PageNumber": "6",
+      "ModuleName": "UltrasoundBalloon",
+      "width": "-1",
+      "ShowMain": "False"
+    },
+<<<<<<< HEAD
+    {
+      "PageNumber": "7",
+      "ModuleName": "UltrasoundImage",
+      "width": "1142",
+      "ShowMain": "True"
+    },
+    {
+      "PageNumber": "8",
+      "ModuleName": "UltrasoundPositioning",
+      "width": "1142",
+      "ShowMain": "True"
+    },
+    {
+      "PageNumber": "9",
+      "ModuleName": "UltrasoundLaserPositioning",
+      "width": "1142",
+      "ShowMain": "True"
+    },
+    {
+      "PageNumber": "10",
+      "ModuleName": "UltrasoundTreat",
+      "width": "1142",
+      "ShowMain": "True"
+    },
+    {
+      "PageNumber": "100",
+      "ModuleName": "JAdministrator",
+      "width": "-1",
+      "ShowMain": "False"
+    },
+    {
+      "PageNumber": "101",
+      "ModuleName": "JEngineer",
+      "width": "-1",
+      "ShowMain": "False"
+    },
+    {
+      "PageNumber": "102",
+      "ModuleName": "UltrasoundWaterRemove",
+      "width": "-1",
+      "ShowMain": "False"
+    },
+    {
+      "PageNumber": "103",
+      "ModuleName": "UltrasoundEpackRemove",
+      "width": "-1",
+      "ShowMain": "False"
+    }
+  ],
+  "JAddFiber": "Normal,pushbutton,NormalUnit,添加导管"
+=======
+    "JModules": {
+        "p_module_need_to_load": "JBase, JMessageBox, UltrasoundCheckUp, JLogin, JAdministrator, JEngineer, JMeasure, JPCCS, Ultrasound, VeinConfig, VeinTreat, RDNDevice, JWaterControl, JUSBConnector, JUltrasoundGenerator, JURRobotArm, JPowerControl",
+        "r_module_need_to_load": "RequestStatusExtension, TickExtension"
+    },
+    "Page": [
+        {
+            "PageNumber": "3",
+            "ModuleName": "JPCCS",
+            "width": "-1",
+            "ShowMain": "False"
+        },
+        {
+            "PageNumber": "4",
+            "ModuleName": "VeinConfig",
+            "width": "1000",
+            "ShowMain": "False"
+        },
+        {
+            "PageNumber": "5",
+            "ModuleName": "VeinTreat",
+            "width": "1400",
+            "ShowMain": "False"
+        },
+        {
+            "PageNumber": "6",
+            "ModuleName": "UltrasoundBalloon",
+            "width": "-1",
+            "ShowMain": "False"
+        },
+        {
+            "PageNumber": "7",
+            "ModuleName": "UltrasoundImage",
+            "width": "1142",
+            "ShowMain": "True"
+        },
+        {
+            "PageNumber": "8",
+            "ModuleName": "UltrasoundPositioning",
+            "width": "1142",
+            "ShowMain": "True"
+        },
+        {
+            "PageNumber": "9",
+            "ModuleName": "UltrasoundLaserPositioning",
+            "width": "1142",
+            "ShowMain": "True"
+        },
+        {
+            "PageNumber": "10",
+            "ModuleName": "UltrasoundTreat",
+            "width": "1142",
+            "ShowMain": "True"
+        },
+        {
+            "PageNumber": "100",
+            "ModuleName": "JAdministrator",
+            "width": "-1",
+            "ShowMain": "False"
+        },
+        {
+            "PageNumber": "101",
+            "ModuleName": "JEngineer",
+            "width": "-1",
+            "ShowMain": "False"
+        },
+        {
+            "PageNumber": "102",
+            "ModuleName": "UltrasoundWaterRemove",
+            "width": "-1",
+            "ShowMain": "False"
+        },
+        {
+            "PageNumber": "103",
+            "ModuleName": "UltrasoundEpackRemove",
+            "width": "-1",
+            "ShowMain": "False"
+        }
+    ],
+    "JAddFiber": "Normal,pushbutton,NormalUnit,添加导管"
+>>>>>>> jzy
+}

@@ -1,0 +1,8 @@
+fiber_delete.png:		删除当前的导向器
+fiber_reset_camera.png:		点击恢复到默认设置
+fiber_direction_camera.png:		点击切换到导向器视角/再点击恢复默认视角
+fiber_visible.png:		切换当前导向器是否可见
+fiber_modify.png:		更方便的移动导向器的靶点和入点
+fiber_info.png:		展开/收起当前导向器的详细信息
+fiber_landing.png:		将当前的导向器降落到皮肤上
+fiber_tag.png:		在3D上标注当前圆盘的角度

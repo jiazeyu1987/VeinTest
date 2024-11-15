@@ -1,0 +1,4 @@
+confirm_cmf.png:		确认曲线位置,生成新的投影
+default_show_cmf.png:		返回CMF的显示方式
+create_curve_cmf.png:		绘制所需要的曲线,按下开始绘制,右键取消绘制
+plance_point_cmf.png:		在影像上选择位置来进行CMF的方式进行截面显示

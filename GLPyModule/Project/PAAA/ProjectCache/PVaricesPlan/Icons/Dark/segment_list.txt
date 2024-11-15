@@ -1,0 +1,15 @@
+segment_tool_paint.png:		笔刷工具:类似于刷子,可以选择合适的刷子大小和刷子类型
+segment_tool_draw.png:		钢笔工具:用鼠标左键在二维视图上画一个闭合曲线,算法将自动填充这个闭合曲线
+segment_tool_threshold.png:		阈值工具:会选择灰度值范围在阈值区间的作为目标区域
+segment_tool_scissors.png:		删除工具:可以在二维视图和三维视图上选择不需要的区域删除
+segment_tool_level_tracing.png:		魔术棒工具:类似于PS的魔术棒,会选择颜色相近的区域
+segment_tool_fill_between_slice.png:		填充工具:算法将填充相邻的两片区域,补充其中的差值
+segment_tool_empty.png:		取消工具:取消当前选择的工具
+btn_undo.png:		撤销:快捷键ctrl+Z
+btn_redo.png:		反撤销:快捷键ctrl+Y
+segment_tool_rotate.png:		矫正工具:将偏斜的影像矫正到合适的位置
+segment_visible_btn2D.png:		在2D视图中显示当前的分割区域
+segment_invisible_btn2D.png:		在2D视图中隐藏当前的分割区域
+segment_visible_btn3D.png:		在3D视图中显示当前的分割区域
+segment_invisible_btn3D.png:		在3D视图中隐藏当前的分割区域
+segment_delete.png:		删除当前的分割区域

@@ -1,0 +1,420 @@
+Log file created at 2024-02-03 09:34:02.689222
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<JPowerControl start unit test >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+
+start test case 0
+-------------------------------------- is running index 0 function reset_page --------------------------------------
+the 1 passed
+
+
+### Tick 0.13 Second
+### Memory 329.74 MB
+
+
+
+start test case 1
+-------------------------------------- is running index 1 function open_control_panel --------------------------------------
+the 2 passed
+
+
+### Tick 0.11 Second
+### Memory 430.66 MB
+
+
+
+start test case 2
+-------------------------------------- is running index 2 function start_bundle_1 --------------------------------------
+the 3 passed
+
+
+### Tick 0.28 Second
+### Memory 434.3 MB
+
+
+
+start test case 3
+-------------------------------------- is running index 3 function check_init_connect_status --------------------------------------
+the 3 passed
+
+
+### Tick 0.06 Second
+### Memory 472.29 MB
+success_connected_to_io use 0.06 second
+
+
+
+start test case 4
+-------------------------------------- is running index 4 function add_tick_event_listener --------------------------------------
+the 5 passed
+
+
+### Tick 0.27 Second
+### Memory -1.08 MB
+
+
+
+start test case 5
+-------------------------------------- is running index 5 function connect_power_device --------------------------------------
+the 5 passed
+
+
+### Tick 0.0 Second
+### Memory 10.33 MB
+success connected to power device use 0.1 second
+
+
+
+start test case 6
+-------------------------------------- is running index 6 function open_power_control_software --------------------------------------
+the 6 passed
+
+
+### Tick 0.0 Second
+### Memory 65.75 MB
+success open software use 0.99 second
+
+
+
+start test case 7
+-------------------------------------- is running index 7 function first_heart_beat --------------------------------------
+the 7 passed
+
+
+### Tick 0.0 Second
+### Memory 15.89 MB
+firat heart beat success use 0.74 second
+
+
+
+start test case 8
+-------------------------------------- is running index 8 function after_opened_software_ui --------------------------------------
+the 9 passed
+
+
+### Tick 0.0 Second
+### Memory 28.95 MB
+
+
+
+start test case 9
+-------------------------------------- is running index 9 function finished --------------------------------------
+the 10 passed
+
+
+### Tick 0.0 Second
+### Memory 53.37 MB
+
+
+
+start test case 10
+-------------------------------------- is running index 10 function after_close_software --------------------------------------
+the 10 passed
+
+
+### Tick 0.0 Second
+### Memory 106.97 MB
+close software success use 0.76 second
+
+
+
+start test case 11
+-------------------------------------- is running index 11 function after_open_software --------------------------------------
+the 11 passed
+
+
+### Tick 0.0 Second
+### Memory 197.78 MB
+open software success use 0.78 second
+
+
+
+start test case 12
+-------------------------------------- is running index 12 function after_close_software --------------------------------------
+the 12 passed
+
+
+### Tick 0.0 Second
+### Memory 209.37 MB
+close software success use 0.81 second
+
+
+
+start test case 13
+-------------------------------------- is running index 13 function after_open_software --------------------------------------
+the 13 passed
+
+
+### Tick 0.0 Second
+### Memory 40.42 MB
+open software success use 0.78 second
+
+
+
+start test case 14
+-------------------------------------- is running index 14 function finished --------------------------------------
+the 15 passed
+
+
+### Tick 0.0 Second
+### Memory -134.58 MB
+
+
+
+start test case 15
+-------------------------------------- is running index 15 function close_water_control_device --------------------------------------
+the 15 passed
+
+
+### Tick 0.0 Second
+### Memory -124.22 MB
+close {key} success use 0.66 second
+
+
+
+start test case 16
+-------------------------------------- is running index 16 function open_water_control_device --------------------------------------
+the 16 passed
+
+
+### Tick 0.0 Second
+### Memory -48.5 MB
+open {key} success use 0.73 second
+
+
+
+start test case 17
+-------------------------------------- is running index 17 function close_ndi_control_device --------------------------------------
+the 17 passed
+
+
+### Tick 0.0 Second
+### Memory -22.89 MB
+close {key} success use 0.88 second
+
+
+
+start test case 18
+-------------------------------------- is running index 18 function open_ndi_control_device --------------------------------------
+the 18 passed
+
+
+### Tick 0.0 Second
+### Memory 22.02 MB
+open {key} success use 0.78 second
+
+
+
+start test case 19
+-------------------------------------- is running index 19 function close_pc_control_device --------------------------------------
+the 19 passed
+
+
+### Tick 0.0 Second
+### Memory 78.45 MB
+close {key} success use 0.67 second
+
+
+
+start test case 20
+-------------------------------------- is running index 20 function open_pc_control_device --------------------------------------
+the 20 passed
+
+
+### Tick 0.0 Second
+### Memory 84.3 MB
+open {key} success use 0.75 second
+
+
+
+start test case 21
+-------------------------------------- is running index 21 function close_pa_control_device --------------------------------------
+the 21 passed
+
+
+### Tick 0.0 Second
+### Memory 137.45 MB
+close {key} success use 0.88 second
+
+
+
+start test case 22
+-------------------------------------- is running index 22 function open_pa_control_device --------------------------------------
+the 22 passed
+
+
+### Tick 0.0 Second
+### Memory 175.55 MB
+open {key} success use 0.82 second
+
+
+
+start test case 23
+-------------------------------------- is running index 23 function close_robot_control_device --------------------------------------
+the 23 passed
+
+
+### Tick 0.0 Second
+### Memory 208.27 MB
+close {key} success use 0.72 second
+
+
+
+start test case 24
+-------------------------------------- is running index 24 function open_robot_control_device --------------------------------------
+the 24 passed
+
+
+### Tick 0.0 Second
+### Memory 254.69 MB
+open {key} success use 0.78 second
+
+
+
+start test case 25
+-------------------------------------- is running index 25 function open_r1_device --------------------------------------
+the 25 passed
+
+
+### Tick 0.0 Second
+### Memory 291.92 MB
+open {key} success use 0.81 second
+
+
+
+start test case 26
+-------------------------------------- is running index 26 function close_r1_device --------------------------------------
+the 26 passed
+
+
+### Tick 0.0 Second
+### Memory 332.93 MB
+close {key} success use 0.74 second
+
+
+
+start test case 27
+-------------------------------------- is running index 27 function open_r2_device --------------------------------------
+the 27 passed
+
+
+### Tick 0.0 Second
+### Memory 391.21 MB
+open {key} success use 0.78 second
+
+
+
+start test case 28
+-------------------------------------- is running index 28 function close_r2_device --------------------------------------
+the 28 passed
+
+
+### Tick 0.0 Second
+### Memory 443.69 MB
+close {key} success use 0.82 second
+
+
+
+start test case 29
+-------------------------------------- is running index 29 function open_r3_device --------------------------------------
+the 29 passed
+
+
+### Tick 0.0 Second
+### Memory 468.83 MB
+open {key} success use 0.76 second
+
+
+
+start test case 30
+-------------------------------------- is running index 30 function close_r3_device --------------------------------------
+the 30 passed
+
+
+### Tick 0.0 Second
+### Memory 498.17 MB
+close {key} success use 0.78 second
+
+
+
+start test case 31
+-------------------------------------- is running index 31 function open_r4_device --------------------------------------
+the 31 passed
+
+
+### Tick 0.0 Second
+### Memory 541.18 MB
+open {key} success use 0.75 second
+
+
+
+start test case 32
+-------------------------------------- is running index 32 function close_r4_device --------------------------------------
+the 32 passed
+
+
+### Tick 0.0 Second
+### Memory 688.82 MB
+close {key} success use 0.82 second
+
+
+
+start test case 33
+-------------------------------------- is running index 33 function finished --------------------------------------
+the 34 passed
+
+
+### Tick 0.0 Second
+### Memory 704.76 MB
+
+
+
+start test case 34
+-------------------------------------- is running index 34 function set_fan_80 --------------------------------------
+the 34 passed
+
+
+### Tick 0.0 Second
+### Memory 721.26 MB
+set_fan_80 success use 4.64 second
+
+
+
+start test case 35
+-------------------------------------- is running index 35 function set_fan_30 --------------------------------------
+the 35 passed
+
+
+### Tick 0.0 Second
+### Memory 726.02 MB
+set_fan_30 success use 6.25 second
+
+
+
+start test case 36
+-------------------------------------- is running index 36 function finished --------------------------------------
+the 37 passed
+
+
+### Tick 0.0 Second
+### Memory 730.14 MB
+
+
+
+
+
+==========================full_life_circle complete==========================
+
+
+
+
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<JPowerControl complete unit  test>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+### Tick 0.0 Second
+### Memory 736.18 MB
+
+
+
+0 test Done
