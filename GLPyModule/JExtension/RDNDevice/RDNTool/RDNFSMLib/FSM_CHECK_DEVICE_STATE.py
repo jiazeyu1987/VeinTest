@@ -19,16 +19,17 @@ class StateSub:
         util.getModuleWidget("RequestStatus").send_cmd(f"UR, SetGapMax, 11")
         # util.getModuleWidget("JIMEConnector").connect_IME()
         # util.getModuleWidget("JURRobotArm").on_robot_arm_connect()
-        util.send_event_str(util.ReconnectEvent, "Power")
-        util.send_event_str(util.ReconnectEvent, "UR")
-        util.send_event_str(util.ReconnectEvent, "UltrasoundGenerator")
-        util.send_event_str(util.ReconnectEvent, "WaterControl")
+        # util.send_event_str(util.ReconnectEvent, "Power")
+        # util.send_event_str(util.ReconnectEvent, "UR")
+        # util.send_event_str(util.ReconnectEvent, "UltrasoundGenerator")
+        # util.send_event_str(util.ReconnectEvent, "WaterControl")
         self.monitor.enter()
 
     def exit(self):
         print(f"leave state ==> {self.name}")
 
     def tickEvent(self, key, map_info):
+        
         self.monitor.get_connect_status(key, map_info)
         self.monitor.always_reconnect()
         self.monitor.update_ui()

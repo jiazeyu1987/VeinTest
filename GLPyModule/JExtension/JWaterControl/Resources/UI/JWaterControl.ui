@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>858</width>
+    <width>905</width>
     <height>845</height>
    </rect>
   </property>
@@ -98,6 +98,12 @@
                 </property>
                 <item row="12" column="2">
                  <widget class="QLabel" name="label_14">
+                  <property name="minimumSize">
+                   <size>
+                    <width>150</width>
+                    <height>0</height>
+                   </size>
+                  </property>
                   <property name="text">
                    <string/>
                   </property>
@@ -132,6 +138,12 @@
                 </item>
                 <item row="6" column="2">
                  <widget class="QLabel" name="label_50">
+                  <property name="minimumSize">
+                   <size>
+                    <width>150</width>
+                    <height>0</height>
+                   </size>
+                  </property>
                   <property name="text">
                    <string/>
                   </property>
@@ -153,6 +165,12 @@
                 </item>
                 <item row="10" column="2">
                  <widget class="QLabel" name="label_9">
+                  <property name="minimumSize">
+                   <size>
+                    <width>150</width>
+                    <height>0</height>
+                   </size>
+                  </property>
                   <property name="text">
                    <string/>
                   </property>
@@ -194,6 +212,12 @@
                 </item>
                 <item row="8" column="2">
                  <widget class="QLabel" name="label_3">
+                  <property name="minimumSize">
+                   <size>
+                    <width>150</width>
+                    <height>0</height>
+                   </size>
+                  </property>
                   <property name="text">
                    <string/>
                   </property>
@@ -228,6 +252,12 @@
                 </item>
                 <item row="14" column="2">
                  <widget class="QLabel" name="label_16">
+                  <property name="minimumSize">
+                   <size>
+                    <width>150</width>
+                    <height>0</height>
+                   </size>
+                  </property>
                   <property name="text">
                    <string/>
                   </property>
@@ -235,6 +265,12 @@
                 </item>
                 <item row="5" column="2">
                  <widget class="QLabel" name="label_49">
+                  <property name="minimumSize">
+                   <size>
+                    <width>150</width>
+                    <height>0</height>
+                   </size>
+                  </property>
                   <property name="text">
                    <string/>
                   </property>
@@ -276,6 +312,12 @@
                 </item>
                 <item row="16" column="2">
                  <widget class="QLabel" name="label_17">
+                  <property name="minimumSize">
+                   <size>
+                    <width>150</width>
+                    <height>0</height>
+                   </size>
+                  </property>
                   <property name="text">
                    <string/>
                   </property>
@@ -344,6 +386,12 @@
                 </item>
                 <item row="11" column="2">
                  <widget class="QLabel" name="label_66">
+                  <property name="minimumSize">
+                   <size>
+                    <width>150</width>
+                    <height>0</height>
+                   </size>
+                  </property>
                   <property name="text">
                    <string/>
                   </property>
@@ -368,6 +416,12 @@
                 </item>
                 <item row="9" column="2">
                  <widget class="QLabel" name="label_5">
+                  <property name="minimumSize">
+                   <size>
+                    <width>150</width>
+                    <height>0</height>
+                   </size>
+                  </property>
                   <property name="text">
                    <string/>
                   </property>
@@ -490,6 +544,12 @@
                 </item>
                 <item row="7" column="2">
                  <widget class="QLabel" name="label_2">
+                  <property name="minimumSize">
+                   <size>
+                    <width>150</width>
+                    <height>0</height>
+                   </size>
+                  </property>
                   <property name="text">
                    <string/>
                   </property>
@@ -527,6 +587,12 @@
                 </item>
                 <item row="0" column="1">
                  <widget class="QLabel" name="label_27">
+                  <property name="minimumSize">
+                   <size>
+                    <width>150</width>
+                    <height>0</height>
+                   </size>
+                  </property>
                   <property name="text">
                    <string/>
                   </property>
@@ -555,6 +621,12 @@
                 </item>
                 <item row="1" column="1">
                  <widget class="QLabel" name="label_67">
+                  <property name="minimumSize">
+                   <size>
+                    <width>150</width>
+                    <height>0</height>
+                   </size>
+                  </property>
                   <property name="text">
                    <string/>
                   </property>

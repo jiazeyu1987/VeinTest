@@ -119,7 +119,7 @@ class JUltrasoundGeneratorWidget(JBaseExtensionWidget):
         util.addWidget2(self.ui.unit_container, self.unit.uiwidget)
         # logpath = self.resourcePath('log/communicate.log').replace("\\","/")
         # util.singleShot(100,lambda:util.getModuleWidget("RequestStatus").send_cmd(f"UltrasoundGenerator, OpenAndShowLog, {logpath}"))
-
+        self.feedback_columns = [('电压', 'V'), ('电流', 'A'), ('功率', 'W')]
         self.params = [0, 0, 0, 0, 0]
         self.treat_power = 0
         self.width = 0
@@ -159,7 +159,7 @@ class JUltrasoundGeneratorWidget(JBaseExtensionWidget):
                 '''
         for (key, value) in zip(self.settings_columns, self.params):
             detail_info += f'''<p>{key}：{value}</p>'''
-        print("OOOOOAAAAAAAAA:",detail_info)
+        #print("OOOOOAAAAAAAAA:",detail_info)
         self.ui.label.setText(detail_info)
 
 
@@ -181,7 +181,7 @@ class JUltrasoundGeneratorWidget(JBaseExtensionWidget):
     def OnReconnectEvent(self, caller, str_event, calldata):
         val = calldata.GetAttribute("value")
         if val == "UltrasoundGenerator":
-            print("on reconnect with ultrasound generator")
+            #print("on reconnect with ultrasound generator")
             self.unit.on_connect()
             self.unit.change_software_status()
 
@@ -191,7 +191,7 @@ class JUltrasoundGeneratorWidget(JBaseExtensionWidget):
         width = int(float(params[1]) * 1000)
         circle = int(float(params[2]) * 1000)
         total = int(float(params[3]) * 1000)
-        print(f"ultrasound generation is {power, width, circle, total}")
+        #print(f"ultrasound generation is {power, width, circle, total}")
 
         util.getModuleWidget("RequestStatus").send_cmd(
             f"UltrasoundGenerator, Send, 0, SetPower, 3000, {power}, {width}, {circle}, {total}")
@@ -274,7 +274,7 @@ class JUltrasoundGeneratorWidget(JBaseExtensionWidget):
         chararray = stringlist.split(" ")
         if len(chararray) != 65:
             return
-        # print(chararray)
+        # #print(chararray)
         # 0xAA
         head = chararray[0]
         # 0x02
@@ -286,14 +286,18 @@ class JUltrasoundGeneratorWidget(JBaseExtensionWidget):
 
         # 待机状态
         software_status = chararray[5]
+        util.parameter_config['UG_software_status'] = int(software_status, 16)
         # PA软件版本低/高
         PA_version = chararray[6:8]
+        util.parameter_config['PA_version'] = util.convert_2byte_to_int(PA_version)
         # 功放ID号低/高
         PA_ID = chararray[8:10]
+        util.parameter_config['PA_ID'] = util.convert_2byte_to_int(PA_ID)
         # PA设定工作频率低/高
         PA_Frequency = chararray[10:12]
         # 工作频率更新状态（0未成功下发，1成功设置）
         PA_Frequency_Status = chararray[12]
+        #print('AC_voltage0')
         # 直流电压设定低/高
         volyage = chararray[13:15]
         # 直流电压更新状态（0未成功下发，1成功设置）
@@ -308,15 +312,17 @@ class JUltrasoundGeneratorWidget(JBaseExtensionWidget):
         sudden_status = chararray[22]
         # 输出交流电压有效值低/高
         AC_voltage = chararray[23:25]
+        util.parameter_config['AC_voltage'] = util.convert_2byte_to_int(AC_voltage) / 100
         # 输出交流电流有效值低/高
         AC_current = chararray[25:27]
+        util.parameter_config['AC_current'] = util.convert_2byte_to_int(AC_current) / 100
         # 功放工作状态字节
         amplifier_working_status = chararray[27]
         # 功放错误信息字节
         amplifier_error_status = chararray[28]
         # PA在线状态 00离线  01在线
         Working_status = int(chararray[29], 16)
-
+        #print('AC_voltage')
         self.ui.lineEdit_6.setText(f"功放ID号:{util.convert_2byte_to_int(PA_ID)}")
         self.ui.lineEdit_7.setText(f"待机状态:{int(software_status, 16)}")
         self.ui.lineEdit_8.setText(f"PA设定功率:{util.convert_2byte_to_int(PA_Frequency)}")
@@ -324,7 +330,25 @@ class JUltrasoundGeneratorWidget(JBaseExtensionWidget):
         self.ui.lineEdit_11.setText(f"突发宽度:{util.convert_2byte_to_int(width)}")
         self.ui.lineEdit_10.setText(f"突发周期:{util.convert_2byte_to_int(circle)}")
         self.ui.lineEdit_3.setText(f"总时间:{util.convert_2byte_to_int(total)}")
-
+        #print('AC_voltage2')
         amplifier_output_status, DC_power_status, *_ = util.extract_states_from_hex_string(chararray[27])
 
         over_temp, output_current, DC_power_connect, *_ = util.extract_states_from_hex_string(chararray[28])
+        #print('AC_voltage3')
+
+        AC_voltage = util.parameter_config['AC_voltage']
+        #print('AC_voltage31')
+        AC_current = util.parameter_config['AC_current']
+        #print('AC_voltage32')
+        AC_power = round(AC_voltage * AC_current, 2)
+        #print('AC_voltage33')
+        self.UG_params = [AC_voltage, AC_current, AC_power]
+        #print('AC_voltage34')
+        detail_info = f'''
+                    <span style="font-size: 28px;">反馈</span>
+                '''
+        for (key, value) in zip(self.feedback_columns, self.UG_params):
+            detail_info += f'''<p>{key[0]}：{value}{key[1]}</p>'''
+            #print('AC_voltage345')
+        #print('AC_voltage4',detail_info)
+        self.ui.label_4.setText(detail_info)

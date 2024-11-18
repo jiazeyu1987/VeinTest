@@ -606,6 +606,7 @@ class PAAAWidget(JBaseProjectWidget):
 
     # 静脉曲张项目
     def _SetPageStyle7(self, page):
+        util.parameter_config = {}
         util.global_data_map["page"] = page
         if page == "1" or page == 1:
             util.setToolbarsVisible(False)

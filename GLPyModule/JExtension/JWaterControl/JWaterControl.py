@@ -374,7 +374,8 @@ class JWaterControlWidget(JBaseExtensionWidget):
 
     def analyse_heart_beat(self, stringlist):
         chararray = stringlist.split(" ")
-        # print("water control heart:", chararray)
+        
+        print("water control heart:", chararray,len(chararray))
         if len(chararray) != 65:
             return
         # print(chararray)
@@ -417,12 +418,13 @@ class JWaterControlWidget(JBaseExtensionWidget):
         # 风扇速度
         fan_speed_str = "".join(chararray[18:22]).replace("0x", "")
         fan_speed = util.convert_hex_to_float(fan_speed_str) * 60
+        print('fan_speed_str',fan_speed_str)
         self.ui.label_2.setText(f"{fan_speed:.2f}")
 
         # 制冷风扇速度
         make_cold_fan_speed_str = "".join(chararray[22:26]).replace("0x", "")
         make_cold_fan_speed = util.convert_hex_to_float(make_cold_fan_speed_str) * 60
-        self.ui.label_2.setText(f"{make_cold_fan_speed:.2f}")
+        # self.ui.label_2.setText(f"{make_cold_fan_speed:.2f}")
         if make_cold_fan_speed < 2000 and util.compressor_work:
             self.counts['make_cold_fan_speed'] += 1
             if self.counts['make_cold_fan_speed'] == 3:
