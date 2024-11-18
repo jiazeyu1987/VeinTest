@@ -51,8 +51,8 @@ class CustomDialog(qt.QDialog):
     slicer.util.addWidget2(self, uiWidget)
     self.ui = slicer.util.childWidgetVariables(uiWidget)
     self.start_pos = None  # 记录鼠标初始位置
-    width = 700
-    height = 1030
+    width = 550
+    height = 1000
 
     self.setFixedHeight(height)
     self.setFixedWidth(width)
@@ -117,7 +117,7 @@ class UnitFunctionTestWidget(JBaseExtensionWidget):
 
   def ondd(self,val):
     print("XXXXXXXXXXXXAAAAAAAA")
-    #self.stop_check_scrcpy()
+    self.stop_check_scrcpy()
 
 
   def start_check_scrcpy(self):
@@ -128,11 +128,21 @@ class UnitFunctionTestWidget(JBaseExtensionWidget):
         self.scrcpy_timer.start(100)
         
         self.scrcpy_timer2.start(100)
-        
+  
+  def kill_process_by_name(self,process_name):
+    import subprocess
+    try:
+        # 使用 taskkill 强制结束目标进程
+        subprocess.run(f"taskkill /f /im {process_name}", shell=True, check=True)
+        print(f"Process {process_name} has been killed.")
+    except subprocess.CalledProcessError as e:
+        print(f"Failed to kill process {process_name}. Error: {e}")
 
   def stop_check_scrcpy(self):
       print("stop_check_scrcpy")
       self.scrcpy_timer.stop()
+      self.kill_process_by_name("scrcpy.exe")
+      return
       process = qt.QProcess()
       process.start("taskkill.exe", ["scrcpy.exe"])
       process.waitForFinished()
@@ -140,14 +150,9 @@ class UnitFunctionTestWidget(JBaseExtensionWidget):
 
   def show_ultra(self):
       if util.ultra_container:
-          self.dialog.show()
           util.removeFromParent2(util.ultra_container)
           util.addWidget2(self.dialog.ui.widget, util.ultra_container)
-          util.removeFromParent2(util.ultra_container)
-          util.addWidget2(self.dialog.ui.widget, util.ultra_container)
-          self.count += 1
-          if self.count == 2:
-              self.scrcpy_timer2.stop()
+          self.scrcpy_timer2.stop()
 
   def startUltrasound(self):
       if self.ultra_process is None or self.ultra_process.state() == qt.QProcess.NotRunning:
@@ -226,5 +231,5 @@ class UnitFunctionTestWidget(JBaseExtensionWidget):
       self.ui.tabWidget.setCurrentIndex(4)
 
   def on_connect(self):
-    self.stop_check_scrcpy()
+    # self.stop_check_scrcpy()
     self.start_check_scrcpy()
