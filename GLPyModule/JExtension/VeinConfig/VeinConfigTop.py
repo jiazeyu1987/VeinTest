@@ -1,3 +1,7 @@
+import math
+import win32process
+import win32gui
+
 import qt, slicer
 from slicer.ScriptedLoadableModule import *
 from slicer.util import VTKObservationMixin
@@ -5,18 +9,9 @@ import slicer.util as util
 import os
 import sqlite3
 from datetime import datetime
-
-
-class WidgetEventFilter(qt.QObject):
-    completed = qt.Signal()
-    print("WidgetEventFilter initialized")
-
-    def eventFilter(self, source, event):
-        if event.type() == qt.QEvent.Close and util.global_data_map['is_closed_water']:
-            print("is closed water event")
-            qt.QTimer.singleShot(0, self.completed.emit)
-            return True
-        return False
+import time
+from ConfigTools.WaterBladder import WaterBladder
+import numpy as np
 
 
 class VeinConfigTop(ScriptedLoadableModule):
@@ -63,156 +58,265 @@ class VeinConfigTopWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         # "setMRMLScene(vtkMRMLScene*)" slot.
         self.uiWidget.setMRMLScene(slicer.mrmlScene)
 
-        self.water_bladder = util.global_data_map['WaterBladder']
-        self.event_filter = WidgetEventFilter()
-        self.event_filter.completed.connect(self.complete_treat)
-        self.water_bladder.uiWidget.installEventFilter(self.event_filter)
+        #self.cursor = util.db_conn.cursor()
+        self._init_ui()
 
-        # 定义固定的样式
-        self.base_style = """
-              QPushButton {{
-              border: 2px solid black; /* 设置边框样式、宽度和颜色 */
-              border-radius: 30px;      /* 设置圆角半径为按钮宽度或高度的一半 */
-              background-color: {color};
-          }}
-      """
+    def _init_ui(self):
+        self.TARGET_JOINT_POS = [43.87, -143.93, 123.31, -136.06, -90.51, -85.47]
 
-        # 初始化状态
-        self.blinking = False
-        self.blink_state = False
-        self.blink_color = None
-
-        # 创建一个定时器用于控制闪烁
-        self.timer = qt.QTimer()
-        self.timer.timeout.connect(self.toggle_blink)
-        # 更新初始状态
-        self.update_indicator(0)
-        self.ui.btn_water_bladder.setStyleSheet(self.base_style.format(color="gray"))
+        self.ui.btn_water_bladder.setStyleSheet('''
+            font: 22px;
+            color: rgba(255,255,255,217);
+            text-align: center;
+            background: #2075F5; 
+            border-radius: 20px;
+            padding-left: 24px;
+        ''')
         self.ui.btn_water_bladder.clicked.connect(self.show_water_bladder)
+        self.water_bladder = util.global_data_map['WaterBladder']
+
+        self.ui.label_info.setAlignment(qt.Qt.AlignCenter)
+
+        self.ui.btn_complete_treat.setIcon(qt.QIcon(self.resourcePath('Icons/back.png')))
+        self.ui.btn_complete_treat.setIconSize(qt.QSize(42, 42))
+        self.ui.btn_complete_treat.setStyleSheet('''
+            border: none;
+            background: transparent;
+        ''')
         self.ui.btn_complete_treat.clicked.connect(self.complete_treat)
-        self.ui.pushButton.clicked.connect(self.save)
 
-        database_path = os.path.join(util.mainWindow().GetProjectBasePath(), "Resources", "Database", "client",
-                                     "ctkDICOM.sql")
-        # 连接到数据库
-        self.conn = sqlite3.connect(database_path)
-        # 创建一个游标对象，用于执行 SQL 语句
-        self.cursor = self.conn.cursor()
-
-        self.ui.label_hospital.text = "XXXX Hospital"
-        self.ui.label_hospital.setStyleSheet("font-size: 24px;")
-
-        self.ui.label_name.setStyleSheet("font-size: 24px;")
-        self.ui.label_info.setStyleSheet("font-size: 24px;")
-        self.ui.label_datetime.setStyleSheet("font-size: 24px;")
+        self.ui.label_datetime.setStyleSheet("font-size: 28px;")
+        self.is_24_hour_format = True
         self.time_timer = qt.QTimer()
         self.time_timer.timeout.connect(self.show_time)
         self.time_timer.start(1000)
-
-        self.clear_timer = qt.QTimer()
-        self.clear_timer.setSingleShot(True)  # 设置为单次触发
-        self.clear_timer.timeout.connect(self.clear_text)
         self.show_time()
 
+        self.toggle_timer = qt.QTimer()
+        self.toggle_timer.timeout.connect(self.toggle_color)
+        self.blinking = False
+
+        self.scrcpy_timer = qt.QTimer()
+        self.scrcpy_timer.timeout.connect(self.startUltrasound)
+
+        self.check_timer = qt.QTimer()
+        self.check_timer.timeout.connect(self.findUltrasound)
+        # self.scrcpy_timer.start(300)
+        self.taskID = None
+        self.handle = None
+        self.ultra_process = None
+
     def enter(self):
-        self.ui.label_name.text = util.global_data_map["patientName"]
+        self.set_water_bladder_status(3)
+        self.clear_status_info()
 
-    def save(self):
-        util.getModuleWidget("JMeasure").on_save()
+    def exit(self):
+        pass
 
-    def show_water_bladder(self, flag=False) -> None:
-        util.global_data_map['is_closed_water'] = flag
-        print("show water bladder treatment")
-        self.water_bladder.show(1)
+    def start_check_scrcpy(self):
+        self.scrcpy_timer.start(1000)
+
+    def stop_check_scrcpy(self):
+        self.scrcpy_timer.stop()
+        process = qt.QProcess()
+        process.start("taskkill.exe", ["scrcpy.exe"])
+        process.waitForFinished()
+
+    def startUltrasound(self):
+        if self.ultra_process is None or self.ultra_process.state() == qt.QProcess.NotRunning:
+            # print("start ultrasound")
+            util.removeFromParent2(util.ultra_container)
+            util.ultra_container = None
+            util.getModuleWidget('VeinConfig').show_ultra_info()
+            util.getModuleWidget('VeinTreat').show_ultra_info()
+            self.handle = None
+            self.ultra_process = qt.QProcess()
+            self.ultra_process.start('scrcpy.exe', util.scrcpy_command)
+            self.taskID = self.ultra_process.processId()
+            # print(f"taskID is {self.taskID}")
+            self.check_timer.start(300)
+
+    def findUltrasound(self):
+        if not self.taskID:
+            print("error---")
+            return
+
+        def get_all_hwnd(hwnd, mouse):
+            if win32gui.IsWindow(hwnd) and win32gui.IsWindowEnabled(hwnd) and win32gui.IsWindowVisible(hwnd):
+                _, window_pid = win32process.GetWindowThreadProcessId(hwnd)
+                # print(window_pid, self.taskID)
+                if window_pid == self.taskID:
+                    self.handle = hwnd
+                    window = qt.QWindow.fromWinId(self.handle)
+                    util.ultra_container = qt.QWidget.createWindowContainer(window)
+                    # print(f"Found window handle: {self.handle}")
+                    # print(f"Window title: {win32gui.GetWindowText(hwnd)}")
+                    self.check_timer.stop()
+                    return False
+            return True
+
+        win32gui.EnumWindows(get_all_hwnd, 0)
+
+    def calculateJointPosError(self):
+        joint_pos_str = util.global_data_map["joint_positions"]
+        joint_pos_rad = joint_pos_str.split(",")
+        joint_pos_deg = [round(math.degrees(float(radian)), 2) for radian in joint_pos_rad]
+
+        assert len(joint_pos_deg) == len(self.TARGET_JOINT_POS), "Target and current joints do not have the same size"
+
+        errors = [target - current for target, current in zip(self.TARGET_JOINT_POS, joint_pos_deg)]
+        err = np.linalg.norm(errors)
+        return err
+
+    def moveToTarget(self):
+        joint_pos_rad = [math.radians(x) for x in self.TARGET_JOINT_POS]
+        joint_pos_str = ', '.join(str(x) for x in joint_pos_rad)
+        util.getModuleWidget("RequestStatus").send_cmd(f"UR, MoveByJoint, {joint_pos_str}, True")
+
+    def calculateJointPosError(self):
+        joint_pos_str = util.global_data_map["joint_positions"]
+        joint_pos_rad = joint_pos_str.split(",")
+        joint_pos_deg = [round(math.degrees(float(radian)), 2) for radian in joint_pos_rad]
+
+        assert len(joint_pos_deg) == len(self.TARGET_JOINT_POS), "Target and current joints do not have the same size"
+
+        errors = [target - current for target, current in zip(self.TARGET_JOINT_POS, joint_pos_deg)]
+        err = np.linalg.norm(errors)
+        return err
+
+    def show_water_bladder(self) -> None:
+        self.water_bladder.exec_()
 
     def complete_treat(self) -> None:
-        print("complete treatment")
-        print(util.global_data_map['is_closed_water'])
+        # print("complete treatment")
+        # print(util.global_data_map['is_closed_water'])
         curr_page = util.global_data_map['page']
-        if curr_page == 5 and not util.global_data_map['has_treat']:
-            util.send_event_str(util.SetPage, 4)
+        if curr_page == 4 and not util.global_data_map['has_treat']:
+            util.send_event_str(util.SetPage, 3)
             return
         self.ui.btn_complete_treat.setChecked(True)
-        self.ui.btn_complete_treat.setStyleSheet("background-color: darkgray;")
-        # 显示确认对话框
-        reply = qt.QMessageBox()
-        reply.setStandardButtons(qt.QMessageBox.Ok | qt.QMessageBox.Cancel)
-        reply.setWindowTitle("确认")
-        reply.resize(400, 400)
-        if curr_page == 4:
-            reply.setText("请确认治疗已全部完成且水囊已自动排水")
-            # 创建按钮
-            ok_button = reply.button(qt.QMessageBox.Ok)
-            ok_button.setText("确认")
-            handle_water = reply.button(qt.QMessageBox.Cancel)
-            handle_water.setText("水处理")
-            handle_water.clicked.connect(lambda: self.show_water_bladder(True))
-            if not util.global_data_map['is_closed_water']:
-                ok_button.setEnabled(False)
-            result = reply.exec_()
-            if result == qt.QMessageBox.Ok:
-                self.ui.btn_complete_treat.setChecked(False)
-                self.ui.btn_complete_treat.setStyleSheet("background-color: #1765AD;")
-                # 患者管理界面
-                vein_id = util.global_data_map["patientID"]
-                self.cursor.execute(f'UPDATE PatientInfo SET IsTreated = ? WHERE ID = ?', (1, vein_id,))
-                self.conn.commit()
-                util.send_event_str(util.SetPage, 3)
+        if curr_page == 3:
+            result = util.getModuleWidget("JMessageBox").show_four_popup(
+                '确认水囊已经下水处理？\n（若未完成，请点击左上角“水处理”按钮，进行处理）')
+            if result == qt.QDialog.Rejected:
+                return
+            result = util.getModuleWidget("JMessageBox").show_four_popup('确认当前患者已治疗完所有静脉？')
+            if result == qt.QDialog.Rejected:
+                return
+            self.ui.btn_complete_treat.setChecked(False)
 
-        elif curr_page == 5:
-            reply.setText("请确认当前segment已治疗完成")
-            reply.setStandardButtons(qt.QMessageBox.Ok | qt.QMessageBox.Cancel)
-            reply.button(qt.QMessageBox.Ok).setText("确认")
-            reply.button(qt.QMessageBox.Cancel).setText("返回")
+            patient_id = util.global_data_map["patientID"]
+            treatment_instruction = util.getModuleWidget("VeinConfig").get_treatment_instruction()
+            treat_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            self.cursor.execute(
+                f'UPDATE PatientInfo SET treatment_instruction = ?,IsTreated = ?,ModifyTime= ? WHERE ID = ?',
+                (treatment_instruction, 1, treat_time, patient_id))
+            util.db_conn.commit()
+            with util.backup_db_conn:
+                util.db_conn.backup(util.backup_db_conn)
+            util.send_event_str(util.SetPage, 2)
+            self.stop_check_scrcpy()
+            util.vein_count = 0
+            util.segment_count.clear()
+        elif curr_page == 4:
+            result = util.getModuleWidget("JMessageBox").show_two_popup('确认当前段落治疗完成？')
+            if result == qt.QDialog.Rejected:
+                return
+            self.ui.btn_complete_treat.setChecked(False)
 
-            result = reply.exec_()
-            if result == qt.QMessageBox.Ok:
-                self.ui.btn_complete_treat.setChecked(False)
-                self.ui.btn_complete_treat.setStyleSheet("background-color: #1765AD;")
-                # 治疗配置界面
-                segment_id = util.global_data_map["segmentID"]
-                self.cursor.execute("UPDATE SegmentInfo SET IsTreated = ? WHERE ID=?", (1, segment_id))
-                self.conn.commit()
-                util.send_event_str(util.SetPage, 4)
+            segment_id = util.global_data_map["segmentID"]
+            self.cursor.execute("UPDATE SegmentInfo SET IsTreated = ? WHERE ID=?", (1, segment_id))
+            util.db_conn.commit()
+            with util.backup_db_conn:
+                util.db_conn.backup(util.backup_db_conn)
+            util.send_event_str(util.SetPage, 3)
 
         self.ui.btn_complete_treat.setChecked(False)
-        self.ui.btn_complete_treat.setStyleSheet("background-color: #1765AD;")
 
-    def update_indicator(self, state) -> None:
-        self.stop_blinking()
-        if state == 0:
-            self.ui.btn_water_bladder.setStyleSheet(self.base_style.format(color="green"))
-        elif state == 1:
-            self.start_blinking("yellow")
-        elif state == 2:
-            self.start_blinking("red")
-        elif state == 3:
-            self.ui.btn_water_bladder.setStyleSheet(self.base_style.format(color="blue"))
-
-    def start_blinking(self, color):
-        self.blinking = True
-        self.blink_color = color
-        self.timer.start(300)  # 每500毫秒切换一次
-
-    def stop_blinking(self):
-        self.blinking = False
-        self.timer.stop()
-        self.ui.btn_water_bladder.setStyleSheet(self.base_style.format(color="gray"))
-
-    def toggle_blink(self):
-        if self.blinking:
-            if self.blink_state:
-                self.ui.btn_water_bladder.setStyleSheet(self.base_style.format(color=self.blink_color))
-            else:
-                self.ui.btn_water_bladder.setStyleSheet(self.base_style.format(color="gray"))
-            self.blink_state = not self.blink_state
+    def set_hour_format(self, flag):
+        self.is_24_hour_format = flag
 
     def show_time(self):
-        self.ui.label_datetime.text = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+        if self.is_24_hour_format:
+            self.ui.label_datetime.text = datetime.now().strftime("%m/%d %H:%M")
+            return
+        self.ui.label_datetime.text = datetime.now().strftime("%m/%d %I:%M %p")
 
-    def set_status_info(self, info):
+    def set_status_info(self, info, flag):
+        if flag == 'g':
+            self.ui.label_info.setStyleSheet('''
+                font: 28px;
+                color: #FFFFFF;
+                background: rgba(60,193,129,51);
+                border-radius: 0px;
+            ''')
+            self.ui.label.setPixmap(qt.QPixmap(self.resourcePath('Icons/green.png')))
+        elif flag == 'y':
+            self.ui.label_info.setStyleSheet('''
+                font: 28px;
+                color: #FFFFFF;
+                background: rgba(255, 221, 51,51);
+                border-radius: 0px;
+            ''')
+            self.ui.label.setPixmap(qt.QPixmap(self.resourcePath('Icons/yellow.png')))
+        elif flag == 'r':
+            self.ui.label_info.setStyleSheet('''
+                font: 28px;
+                color: #FFFFFF;
+                background: rgba(255, 102, 102,51);
+                border-radius: 0px;
+            ''')
+            self.ui.label.setPixmap(qt.QPixmap(self.resourcePath('Icons/red.png')))
         self.ui.label_info.text = info
-        self.clear_timer.start(3000)
 
-    def clear_text(self):
+    def clear_status_info(self):
         self.ui.label_info.text = ""
+        self.ui.label_info.setStyleSheet('''
+            font: 28px;
+            color: #FFFFFF;
+            background: rgba(60,193,129,51);
+            border-radius: 0px;
+        ''')
+        self.ui.label.clear()
+
+    def start_toggle(self):
+        self.toggle_timer.start(500)
+
+    def stop_toggle(self):
+        self.toggle_timer.stop()
+
+    def toggle_color(self):
+        if self.blinking:
+            self.ui.label_2.setStyleSheet('''
+                background: #E2B134;
+                border-radius: 14px;
+            ''')
+        else:
+            self.ui.label_2.setStyleSheet('''
+                background: #212121;
+                border-radius: 14px;
+            ''')
+        self.blinking = not self.blinking
+
+    def set_water_bladder_status(self, status):
+        # print(f"blob status {status}")
+        if status == 0:
+            self.ui.label_2.setStyleSheet('''
+                background: #3CC181;
+                border-radius: 14px;
+            ''')
+        elif status == 1:
+            self.ui.label_2.setStyleSheet('''
+                background: #E2B134;
+                border-radius: 14px;
+            ''')
+        elif status == 2:
+            self.ui.label_2.setStyleSheet('''
+                background: #FF513A;
+                border-radius: 14px;
+            ''')
+        else:
+            self.ui.label_2.setStyleSheet('''
+                background: #212121;
+                border-radius: 14px;
+            ''')

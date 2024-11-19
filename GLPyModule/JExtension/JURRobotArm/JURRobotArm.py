@@ -14,7 +14,8 @@ import numpy as np
 from Base.JBaseExtension import JBaseExtensionWidget
 import math
 import qt
-
+from Controls.TherapyView import TherapyView
+import sqlite3
 
 #
 # JURRobotArm
@@ -223,6 +224,316 @@ class JURRobotArmWidget(JBaseExtensionWidget):
         self.ui.slider6.value = 0
         self.ui.slider6.setDecimals(2)
         self.ui.slider6.connect('valueChanged(double)', self.on_ctkSliderWidgetChanged6)
+        self._init_database()
+        self.init_extra()
+
+    def _init_database(self):
+        dbpath = os.path.join(util.mainWindow().GetProjectBasePath(), "Resources", "ccwssm")
+        backup_dbpath = os.path.join(util.mainWindow().GetProjectBasePath(), "Resources", "zccwssm")
+        # 创建数据库连接
+        util.db_conn = sqlite3.connect(dbpath)
+        util.backup_db_conn = sqlite3.connect(backup_dbpath)
+        print(f'backup db----{util.backup_db_conn}')
+        self.cursor = util.db_conn.cursor()
+
+        # 创建用户表格
+        self.cursor.execute('''
+            CREATE TABLE IF NOT EXISTS users (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    username VARCHAR(255) NOT NULL unique,
+                    password VARCHAR(255) NOT NULL,
+                    role INTEGER DEFAULT 0,
+                    registration_time DATETIME,
+                    last_login_time DATETIME
+                    )
+            ''')
+
+        self.cursor.execute('''
+            CREATE TABLE IF NOT EXISTS PatientInfo (
+                ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                UserID INTEGER NOT NULL,
+                PatientID VARCHAR(52),
+                Name VARCHAR(100),
+                Birthday VARCHAR(100),
+                Age INTEGER,
+                Gender INTEGER,
+                TreatType INTEGER,
+                Degree INTEGER,
+                IsRelapse INTEGER,
+                IsTreated INTEGER,
+                Note VARCHAR(500),
+                treatment_instruction VARCHAR(500),
+                TreatTime VARCHAR(100),
+                CreateTime VARCHAR(100),
+                ModifyTime VARCHAR(100)
+            )
+        ''')
+
+        self.cursor.execute('''
+            CREATE TABLE IF NOT EXISTS VeinInfo (
+                ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                PatientID VARCHAR(52),
+                VeinName VARCHAR(100)
+            )
+        ''')
+
+        self.cursor.execute('''
+            CREATE TABLE IF NOT EXISTS SegmentInfo (
+                ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                VeinID INTEGER,
+                SegmentName VARCHAR(100),
+                IsTreated INTEGER DEFAULT 0
+            )
+        ''')
+
+        self.cursor.execute('''
+            CREATE TABLE IF NOT EXISTS PointInfo (
+                ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                SegmentID INTEGER,
+                PointName VARCHAR(50),
+                Count INTEGER DEFAULT 0,
+                IsTreated INTEGER DEFAULT 0
+            )
+        ''')
+
+        self.cursor.execute('''
+                CREATE TABLE IF NOT EXISTS SegmentImagesInfo (
+                    ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                    PointID INTEGER,
+                    ImagePath VARCHAR(300),
+                    TreatPower INTEGER DEFAULT 0,
+                    Width FLOAT DEFAULT 0.0,
+                    Circle FLOAT DEFAULT 0.0,
+                    CoolTime FLOAT DEFAULT 0.0,
+                    TotalTime FLOAT DEFAULT 0.0,
+                    TotalEnergy FLOAT DEFAULT 0.0,
+                    flag TINYINT DEFAULT 0,
+                    CreateTime VARCHAR(100),
+                    ModifyTime VARCHAR(100)
+                )
+            ''')
+
+        util.db_conn.commit()
+        with util.backup_db_conn:
+            util.db_conn.backup(util.backup_db_conn)
+
+    def init_extra(self):
+        self.ui.btn_pre.setStyleSheet(util.button2_style.format("21"))
+        self.ui.btn_pre.setIcon(qt.QIcon(self.resourcePath('Icons/pre.png')))
+        self.ui.btn_pre.clicked.connect(self.on_pre_pos)
+        self.ui.btn_next.setStyleSheet(util.button2_style.format("21"))
+        self.ui.btn_next.setIcon(qt.QIcon(self.resourcePath('Icons/next.png')))
+        self.ui.btn_next.clicked.connect(self.on_next_pos)
+
+        self.ui.btn_left.setStyleSheet(util.button2_style.format("21"))
+        self.ui.btn_left.setIcon(qt.QIcon(self.resourcePath('Icons/left.png')))
+        self.ui.btn_left.clicked.connect(self.on_left_pos)
+        self.ui.btn_right.setStyleSheet(util.button2_style.format("21"))
+        self.ui.btn_right.setIcon(qt.QIcon(self.resourcePath('Icons/right.png')))
+        self.ui.btn_right.clicked.connect(self.on_right_pos)
+
+        self.ui.btn_modify.setStyleSheet(util.button2_style.format("21"))
+        self.ui.btn_modify.setIcon(qt.QIcon(self.resourcePath('Icons/modify.png')))
+        self.ui.btn_modify.setIconSize(qt.QSize(32, 32))
+        self.ui.btn_modify.toggled.connect(self._on_modify_step)
+        self.ui.robot_step.setStyleSheet('''
+                QComboBox {
+                    background: transparent;
+                    color: white;
+                    font: 20px;
+                }
+                QComboBox::drop-down {
+                    border: none;
+                }
+                QComboBox::down-arrow {
+                    image: none;
+                }
+        ''')
+
+        self.ui.vein_view.setStyleSheet(util.button2_style.format("32"))
+        self.ui.vein_view.clicked.connect(self._changeView)
+        self.vein_view_timer = qt.QTimer()
+        self.vein_view_timer.timeout.connect(self._check_change_view_done)
+
+
+        self.therapy_view = TherapyView()
+        self.segment_id = 0
+        self.init_extra_database()
+
+    def _changeView(self):
+        # print("change view called [py]")
+        try:
+            #util.getModuleWidget("VeinConfigTop").set_status_info('治疗头位姿调整中', 'g')
+            util.getModuleWidget("RequestStatus").send_cmd(f"UR, ChangeView, 1")
+            self.vein_view_timer.start(500)
+            # print("ChangeView returned, proceeding...")
+        except RuntimeError as e:
+            print(f"Error: {e}")
+
+    def _check_change_view_done(self):
+        if util.getModuleWidget("RequestStatus").send_synchronize_cmd(f"UR, IsRobotSteady") == "True":
+            self.vein_view_timer.stop()
+        return
+
+
+    def init_extra_database(self):
+        self.current_position = 1
+        self.cursor = util.db_conn.cursor()
+        self.cursor.execute(
+            "SELECT ID,Count,IsTreated,s.ImagePath FROM PointInfo p LEFT JOIN (SELECT PointID,ImagePath,MAX(CreateTime) "
+            "AS CreateTime FROM SegmentImagesInfo GROUP BY PointID) s ON p.ID = s.PointID WHERE SegmentID = ?",
+            (self.segment_id,))
+        Points = self.cursor.fetchall()
+        # print(Points)
+        self.pos_to_id = {index + 1: list(value) for index, value in enumerate(Points)}
+        if not self.pos_to_id:
+            self.therapy_view.addNewPos()
+            self.therapy_view.setPointLabel()
+            self.cursor.execute('''INSERT INTO PointInfo (SegmentID,PointName)
+            VALUES (?, ?)''',
+                                (self.segment_id, 'P' + str(self.current_position)))
+            self.point_id = str(self.cursor.lastrowid)
+            util.db_conn.commit()
+            with util.backup_db_conn:
+                util.db_conn.backup(util.backup_db_conn)
+            self.pos_to_id[self.current_position] = [self.point_id, 0, 0]
+            return
+
+        # print(self.pos_to_id)
+        for key, value in self.pos_to_id.items():
+            self.therapy_view.addNewPos()
+            if value[2] == 1:
+                self.therapy_view.setPosTherapied(key - 1)
+            if value[3]:
+                before, after = value[3].split(';')
+                self.images[key][0] = before
+                self.images[key][1] = after
+
+        self.point_id = self.pos_to_id[self.current_position][0]
+        self.therapy_view.setPointLabel()
+        self.therapy_view.setTherapyCountLabel(self.pos_to_id[self.current_position][1])
+
+    def on_next_pos(self):
+        new_flag = self.therapy_view.nextPos()
+        self.current_position += 1
+        if new_flag:
+            self.cursor.execute('''INSERT INTO PointInfo (SegmentID,PointName)
+            VALUES (?, ?)''',
+                                (self.segment_id, 'P' + str(self.current_position)))
+            self.point_id = str(self.cursor.lastrowid)
+            util.db_conn.commit()
+            with util.backup_db_conn:
+                util.db_conn.backup(util.backup_db_conn)
+            self.pos_to_id[self.current_position] = [self.point_id, 0, 0]
+        self.point_id = self.pos_to_id[self.current_position][0]
+        self.therapy_view.setPointLabel()
+        self.on_next()
+        self.therapy_view.setTherapyCountLabel(self.pos_to_id[self.current_position][1])
+        util.getModuleWidget("VeinConfigTop").set_status_info(f'后位移{self.ui.robot_step.currentText[0]}mm', 'g')
+        self.vein_view_timer.start(100)
+
+    def on_next(self):
+        # import random
+        # self.ui.label_3.setText(f"{random.randint(-150, 150), random.randint(-150, 150)}")
+        # pass
+        print("on next called [py]")
+        try:
+            ret = util.getModuleWidget("RequestStatus").send_synchronize_cmd(f"UR, MoveToNextPose")
+            if not ret:
+                raise RuntimeError("MoveToNextPose returned False, cannot proceed forward.")
+
+            # Proceed with the rest of the code if no error
+            print("MoveToNextPose returned True, proceeding...")
+
+        except RuntimeError as e:
+            print(f"Error: {e}")
+
+    def on_pre(self):
+        # import random
+        # self.ui.label_3.setText(f"{random.randint(-150, 150), random.randint(-150, 150)}")
+        # pass
+        print("on previous called [py]")
+        try:
+            ret = util.getModuleWidget("RequestStatus").send_synchronize_cmd(f"UR, MoveToPrevPose")
+            if not ret:
+                raise RuntimeError("MoveToPrevPose returned False, cannot proceed forward.")
+
+            # Proceed with the rest of the code if no error
+            print("MoveToPrevPose returned True, proceeding...")
+
+        except RuntimeError as e:
+            print(f"Error: {e}")
+
+    def on_pre_pos(self):
+        self.current_position -= 1
+        if self.current_position < 1:
+            self.current_position = 1
+        self.therapy_view.prePos()
+        self.therapy_view.setPointLabel()
+        self.on_pre()
+        self.point_id = self.pos_to_id[self.current_position][0]
+        self.therapy_view.setTherapyCountLabel(self.pos_to_id[self.current_position][1])
+        util.getModuleWidget("VeinConfigTop").set_status_info(f'前位移{self.ui.robot_step.currentText[0]}mm', 'g')
+        self.vein_view_timer.start(100)
+
+    def on_left_pos(self):
+        util.getModuleWidget("VeinConfigTop").set_status_info(f'左位移{self.ui.robot_step.currentText[0]}mm', 'g')
+        self.vein_view_timer.start(100)
+        pass
+
+    def on_right_pos(self):
+        util.getModuleWidget("VeinConfigTop").set_status_info(f'右位移{self.ui.robot_step.currentText[0]}mm', 'g')
+        self.vein_view_timer.start(100)
+        pass
+    
+
+    def _on_modify_step(self, checked):
+        if checked:
+            self.ui.robot_step.setStyleSheet('''
+                QComboBox {
+                    background: #232428;
+                    border-radius: 4px;
+                    font: 20px;
+                    border: 1px solid #699FC3
+                    }
+                QComboBox::down-arrow {
+                    width: 10px;
+                    height: 10px;
+                    padding-left: 8px;
+                }
+            ''')
+            self.ui.robot_step.setEnabled(True)
+        else:
+            self.ui.robot_step.setStyleSheet('''
+                QComboBox {
+                    background: transparent;
+                    color: white;
+                    font: 20px;
+                }
+                QComboBox::drop-down {
+                    border: none;
+                }
+                QComboBox::down-arrow {
+                    image: none;
+                }
+            ''')
+            self.ui.robot_step.setEnabled(False)
+            self.setStepValue()
+
+    def setStepValue(self):
+        print("set step value called [py]")
+        try:
+            ret = util.getModuleWidget("RequestStatus").send_synchronize_cmd(
+                f"UR, SetStepValue, {int(self.ui.robot_step.currentText[0])}")
+            if not ret:
+                raise RuntimeError("SetStepValue returned False, cannot proceed forward.")
+
+            # Proceed with the rest of the code if no error
+            print("SetStepValue returned True, proceeding...")
+
+        except RuntimeError as e:
+            print(f"Error: {e}")
+
 
     def on_ctkSliderWidgetChanged1(self, value):
         # print("on ctk slider widgeet:",self.ui.ctkSliderWidget1.value)
@@ -282,6 +593,7 @@ class JURRobotArmWidget(JBaseExtensionWidget):
         self.map_info = map_info
         self.ui.textEdit.clear()
         util.getModuleWidget("RDNDevice").check_map['robot'] = False
+        print("HHHHHHHHHHHHHHHHHHHHL:",map_info["connect_status"])
         if "connect_status" in map_info and map_info["connect_status"] == "-1":
             self.ui.L1.setText("未连接")
             self.ui.L1.setStyleSheet("color: red;")
@@ -466,7 +778,7 @@ class JURRobotArmWidget(JBaseExtensionWidget):
             "UR, Rotate, -115.941,-120.35,101.352,-84.631,46.454,-5.334, 0, 0, 0, 0")
 
     def on_robot_arm_connect(self):
-        util.getModuleWidget("RequestStatus").send_cmd("UR, Connect, 172.30.38.165, 30004")
+        util.getModuleWidget("RequestStatus").send_cmd("UR, Connect, 172.30.38.99, 30004")
         # util.getModuleWidget("RequestStatus").send_cmd("UR, Open")
 
     def on_robot_arm_disconnect(self):
