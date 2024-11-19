@@ -15,7 +15,7 @@ import string
 import slicer
 
 current_main_module_name = ""
-
+hardware_state={}
 username = None
 user_id = 0
 user_role = 0
