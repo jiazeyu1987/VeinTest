@@ -804,7 +804,7 @@ class JURRobotArmWidget(JBaseExtensionWidget):
             "UR, Rotate, -115.941,-120.35,101.352,-84.631,46.454,-5.334, 0, 0, 0, 0")
 
     def on_robot_arm_connect(self):
-        util.getModuleWidget("RequestStatus").send_cmd("UR, Connect, 172.30.38.99, 30004")
+        util.getModuleWidget("RequestStatus").send_cmd(f"UR, Connect, {self.ui.comboBox.currentText}, 30004")
         # util.getModuleWidget("RequestStatus").send_cmd("UR, Open")
 
     def on_robot_arm_disconnect(self):
