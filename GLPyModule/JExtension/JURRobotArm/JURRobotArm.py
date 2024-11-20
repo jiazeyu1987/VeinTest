@@ -434,6 +434,7 @@ class JURRobotArmWidget(JBaseExtensionWidget):
                 before, after = value[3].split(';')
                 self.images[key][0] = before
                 self.images[key][1] = after
+            break
 
         self.point_id = self.pos_to_id[self.current_position][0]
         self.therapy_view.setPointLabel()
@@ -619,7 +620,6 @@ class JURRobotArmWidget(JBaseExtensionWidget):
         self.map_info = map_info
         self.ui.textEdit.clear()
         util.getModuleWidget("RDNDevice").check_map['robot'] = False
-        print("HHHHHHHHHHHHHHHHHHHHL:",map_info["connect_status"])
         if "connect_status" in map_info and map_info["connect_status"] == "-1":
             self.ui.L1.setText("未连接")
             self.ui.L1.setStyleSheet("color: red;")
