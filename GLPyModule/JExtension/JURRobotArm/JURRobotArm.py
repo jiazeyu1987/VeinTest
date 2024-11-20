@@ -369,21 +369,7 @@ class JURRobotArmWidget(JBaseExtensionWidget):
         self._setInitialPose()
 
     def _setInitialPose(self):
-        result = util.getModuleWidget("JMessageBox").show_two_popup('是否确认初始位置及方向，进入治疗程序？')
-        if result == qt.QDialog.Rejected:
-            self.ui.btn_initial.setEnabled(False)
-            return
-        try:
-            ret = util.getModuleWidget("RequestStatus").send_synchronize_cmd(f"UR, SetInitialPose")
-            if not ret:
-                raise RuntimeError("SetInitialPose returned False, cannot proceed forward.")
-            util.send_event_str(util.SetPage, 4)
-
-            # Proceed with the rest of the code if no error
-            # print("SetInitialPose returned True, proceeding...")
-
-        except RuntimeError as e:
-            print(f"Error: {e}")
+       util.getModuleWidget("RequestStatus").send_synchronize_cmd(f"UR, SetInitialPose")
 
 
     def _changeView(self):
