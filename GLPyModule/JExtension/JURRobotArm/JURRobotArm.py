@@ -81,6 +81,9 @@ class JURRobotArmWidget(JBaseExtensionWidget):
     def setup(self):
         super().setup()
         self.ui.tabWidget.tabBar().hide()
+
+        self.ui.pushButton.connect('clicked()',self.on_init)
+
         self.EMERGENCY_STOPPED_RESET = 1
         self.PROTECTIVE_STOPPED_RESET = 1
         self.IS_PROGRAM_RUNNING = 0
@@ -226,6 +229,7 @@ class JURRobotArmWidget(JBaseExtensionWidget):
         self.ui.slider6.connect('valueChanged(double)', self.on_ctkSliderWidgetChanged6)
         self._init_database()
         self.init_extra()
+        
 
     def _init_database(self):
         dbpath = os.path.join(util.mainWindow().GetProjectBasePath(), "Resources", "ccwssm")
@@ -359,6 +363,28 @@ class JURRobotArmWidget(JBaseExtensionWidget):
         self.therapy_view = TherapyView()
         self.segment_id = 0
         self.init_extra_database()
+        util.addWidget2(self.ui.widget_path, self.therapy_view)
+
+    def on_init(self):
+        self._setInitialPose()
+
+    def _setInitialPose(self):
+        result = util.getModuleWidget("JMessageBox").show_two_popup('是否确认初始位置及方向，进入治疗程序？')
+        if result == qt.QDialog.Rejected:
+            self.ui.btn_initial.setEnabled(False)
+            return
+        try:
+            ret = util.getModuleWidget("RequestStatus").send_synchronize_cmd(f"UR, SetInitialPose")
+            if not ret:
+                raise RuntimeError("SetInitialPose returned False, cannot proceed forward.")
+            util.send_event_str(util.SetPage, 4)
+
+            # Proceed with the rest of the code if no error
+            # print("SetInitialPose returned True, proceeding...")
+
+        except RuntimeError as e:
+            print(f"Error: {e}")
+
 
     def _changeView(self):
         # print("change view called [py]")
