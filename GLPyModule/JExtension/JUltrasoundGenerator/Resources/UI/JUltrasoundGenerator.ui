@@ -139,6 +139,13 @@
                     </widget>
                    </item>
                    <item>
+                    <widget class="QPushButton" name="pushButton_3">
+                     <property name="text">
+                      <string>停止发射</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
                     <widget class="QPushButton" name="pushButton_2">
                      <property name="text">
                       <string>参数设置</string>

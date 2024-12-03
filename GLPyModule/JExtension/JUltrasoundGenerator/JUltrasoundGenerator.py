@@ -137,7 +137,7 @@ class JUltrasoundGeneratorWidget(JBaseExtensionWidget):
         self.ui.btn_mcu.connect('clicked()', self.on_reset_mcu)
         self.ui.pushButton.connect('clicked()', self.on_set_work)
         self.ui.pushButton_2.connect('clicked()',self.on_set_paras)
-
+        self.ui.pushButton_3.connect('clicked()',self.on_stop)
         slicer.mrmlScene.AddObserver(util.ReconnectEvent, self.OnReconnectEvent)
 
         validator = qt.QIntValidator(self.ui.lineEdit)
@@ -225,6 +225,13 @@ class JUltrasoundGeneratorWidget(JBaseExtensionWidget):
         self.ui.lb_start.setText("功率正在发射中：")
         self.ui.btn_start.setText("发射中")
         self.ui.btn_start.setStyleSheet("color: red;")
+
+    def on_stop(self):
+        util.getModuleWidget("RequestStatus").send_cmd(f"UltrasoundGenerator, Send, 0, StartGenerator, 170")
+        self.ui.btn_start.setEnabled(True)
+        self.ui.lb_start.setText("功率已发射完成：")
+        self.ui.btn_start.setText("发射")
+        self.ui.btn_start.setStyleSheet("")
 
     def start_completed(self):
         util.getModuleWidget("RequestStatus").send_cmd(f"UltrasoundGenerator, Send, 0, StartGenerator, 170")
